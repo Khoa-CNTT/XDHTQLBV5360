@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXURY BUS</title>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="76x76" href="../../favicon/logo72x72.png">
+    <link rel="icon" type="image/icon" sizes="32x32" href="../../favicon/logo32x32.png">
+    <link rel="icon" type="image/icon" sizes="16x16" href="../../favicon/logo16x16.png">
+    <link rel="manifest" href="../../favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+
+    <!-- Icon -->
+    <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
+
+    <!-- Styles -->
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" href="../../css/main.css">
+
+    <!-- Script -->
+    <script th:src="@{/js/scripts.js}"></script>
+
+</head>
+
+<body>
+<!-- Header -->
+<header id="header" class="header">
+    <div class="container">
+        <!-- Logo -->
+        <a id="home" href="/" class="logo top-bar-logo">
+            <img src="../../icon/logo-primary.svg" alt="LUXURY BUS" class="top-bar-logo__img">
+        </a>
+
+        <div class="top-bar">
+            <!-- More -->
+            <button class="top-bar__more d-none d-lg-block">
+                <img src="../../icon/more.svg" alt="" class="icon top-bar__more-icon">
+            </button>
+
+            <!-- Actions -->
+            <div class="top-act d-lg-none">
+
+                <a th:href="@{/login}" class="top-act__sign-up">
+                    <img src="../../icon/person.svg" alt="">
+                    <span class="top-act__title">Đăng nhập/Đăng ký</span>
+                </a>
+            </div>
+
+            <!-- More -->
+            <button class="top-bar__more d-none d-lg-block">
+                <img src="../../icon/person.svg" alt="" class="icon top-bar__more-icon">
+            </button>
+        </div>
+
+    </div>
+</header>
+
+<!-- Main -->
+<main class="container auth-content">
+    <div class="auth-register">
+        <!-- Auth Intro -->
+        <div class="auth__intro d-lg-none">
+            <p class="auth__intro-text">
+                <span class="text-2xl font-semibold text-green">LUXURY BUS</span>
+                <br>
+                <span class="text-xl">Cùng bạn trên mọi nẻo đường</span>
+            </p>
+            <div class="auth__intro-img">
+                <div class="auth__intro-img--custom">
+                    <img src="../../imgs/intro.png" alt="" class="auth__intro-img--custom-img">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Auth Content -->
+        <div class="auth__content">
+            <div class="auth__content-inner">
+                <h1 class="auth__heading">Tạo tài khoản</h1>
+
+                <div th:if="${error}" class="alert alert-danger">
+                    <span style="color: red" th:text="${error}" > </span>
+                </div>
+
+                <form  th:action="@{/register/process}"
+                       th:object="${registerUser}" method="post"  class="form auth__form">
+                    <div class="form__group">
+                        <div class="form__text-input flex">
+                            <input type="text" name="username" id="inputFullName" placeholder="Tên đầy đủ" th:field="*{fullName}" class="form__input form-control" required
+                                   autofocus>
+                            <div th:if="${#fields.hasErrors('fullName')}">
+                                <ul>
+                                    <li th:each = "e: ${#fields.errors('fullName')}"  th:text="${e}"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__group">
+                        <div class="form__text-input flex">
+                            <input type="text" name="username" id="inputPhoneNumber" th:field="*{phoneNumber}" placeholder="Nhập số điện thoại" class="form__input form-control" required
+                                   autofocus>
+                            <div th:if="${#fields.hasErrors('phoneNumber')}">
+                                <ul>
+                                    <li th:each = "e: ${#fields.errors('phoneNumber')}"  th:text="${e}"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__group">
+                        <div class="form__text-input flex">
+                            <input type="email" name="inputEmail" id="inputEmail" th:field="*{email}" placeholder="Nhập email" class="form__input form-control" required
+                                   autofocus>
+                            <div th:if="${#fields.hasErrors('email')}">
+                                <ul>
+                                    <li th:each = "e: ${#fields.errors('email')}"  th:text="${e}"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__group">
+                        <div class="form__text-input">
+                            <input type="password" th:field="*{passWord}" name="password" id="inputPassword" placeholder="Mật khẩu" class="form__input" required
+                                   minlength="6">
+                            <div th:if="${#fields.hasErrors('passWord')}">
+                                <ul>
+                                    <li th:each = "e: ${#fields.errors('passWord')}"  th:text="${e}"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__group auth__btn-group">
+                        <button type="submit" class="btn btn--primary auth__btn form__submit-btn">Đăng ký</button>
+                    </div>
+                </form>
+
+                <p class="auth__text">
+                    Bạn đã có tài khoản?
+                    <a th:href="@{/login}" class="auth__link auth__text-link">Đăng nhập</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Form Fragment</title>
+</head>
+<body>
+    <!-- Search Form Fragment -->
+    <div th:fragment="searchForm(action)" class="search-form">
+        <form th:action="${action}" method="post" onsubmit="return validateForm()" class="search-form__form">
+            <!-- Chọn thông tin -->
+            <div class="search-form__content">
+                <!-- Row 1 -->
+                <div class="search-form__row search-form__row--left">
+                    <div class="search-form__group search-form__group--left">
+                        <label for="departure" class="search-form__label">Điểm đi</label>
+                        <div class="search-form__text-input input-search custom-select-container">
+                            <select id="departure" class="form__input input-search__input--go-on" name="departure" >
+                                <option th:value="${deparTure != null} ? ${deparTure.id}  : ''"
+                                        th:text="${deparTure != null} ? ${deparTure.stopName}  : 'Chọn nơi đi'">
+                                </option>
+                                <optgroup th:each="tinhTp : ${listTinhTp}" th:label="${tinhTp.name}">
+                                    <option th:each="stop : ${tinhTp.getStops()}"
+                                            th:value="${stop.id}"
+                                            th:text="${stop.stopName}">
+                                    </option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" id="switchLocationsBtn" class="switch-locations search-form__group--icon switch-icon">
+                        <img src="../../icon/switch_location.svg" alt="Đổi điểm đi/đến" th:src="@{/icon/switch_location.svg}">
+                    </button>
+                    <div class="search-form__group search-form__group--right">
+                        <label for="destination" class="search-form__label">Điểm đến</label>
+                        <div class="search-form__text-input input-search custom-select-container">
+                            <select id="destination" class="form__input input-search__input--go-off" name="destination" >
+                                <option th:value="${destinaTion != null} ?  ${destinaTion.id} : ''"
+                                        th:text="${destinaTion != null} ? ${destinaTion.stopName} : 'Chọn nơi đến'">
+                                </option>
+                                <optgroup th:each="tinhTp : ${listTinhTp}" th:label="${tinhTp.name}">
+                                    <option th:each="stop : ${tinhTp.getStops()}"
+                                            th:value="${stop.id}"
+                                            th:text="${stop.stopName}">
+                                    </option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="separate d-none d-lg-block"></div>
+
+                <!-- Row 2 -->
+                <div class="search-form__row search-form__date">
+                    <div class="search-form__group">
+                        <label for="date" class="search-form__label">Ngày đi</label>
+                        <div class="search-form__text-input input-search">
+                            <input type="date" id="date" name="departureDate" placeholder="Chọn ngày đi" required
+                                   class="choosedate input-search__input" th:value="${departureDate != null} ?  ${departureDate} : ''">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="search-form__bottom">
+                <button class="search-form__bottom--button btn btn--primary btn--rounded">Tìm chuyến xe</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- JavaScript for the search form -->
+    <script th:fragment="searchFormScripts">
+        function validateForm() {
+            var departure = document.getElementById("departure");
+            var destination = document.getElementById("destination");
+            var date = document.getElementById("date");
+
+            if (departure.value === "") {
+                alert("Vui lòng chọn điểm đi.");
+                departure.focus();
+                return false;
+            }
+
+            if (destination.value === "") {
+                alert("Vui lòng chọn điểm đến.");
+                destination.focus();
+                return false;
+            }
+
+            if (departure.value === destination.value) {
+                alert("Điểm đi và điểm đến không thể giống nhau.");
+                destination.focus();
+                return false;
+            }
+
+            if (!date.value) {
+                alert("Vui lòng chọn ngày đi.");
+                date.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // This function will be called when the document is loaded
+        function initSearchForm() {
+            // Switch locations functionality
+            document.getElementById('switchLocationsBtn').addEventListener('click', function() {
+                var departure = document.getElementById('departure');
+                var destination = document.getElementById('destination');
+
+                // Store the current values and selected indexes
+                var tempValue = departure.value;
+                var tempIndex = departure.selectedIndex;
+
+                // Swap the values
+                departure.value = destination.value;
+                destination.value = tempValue;
+
+                // Update the displayed text if needed
+                if (departure.selectedIndex === 0 && destination.selectedIndex === 0) {
+                    // If both are at the first option, swap the text
+                    var tempText = departure.options[0].text;
+                    departure.options[0].text = destination.options[0].text;
+                    destination.options[0].text = tempText;
+                } else {
+                    // Find the matching options and select them
+                    for (var i = 0; i < departure.options.length; i++) {
+                        if (departure.options[i].value === destination.value) {
+                            departure.selectedIndex = i;
+                            break;
+                        }
+                    }
+
+                    for (var i = 0; i < destination.options.length; i++) {
+                        if (destination.options[i].value === tempValue) {
+                            destination.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            });
+
+            // Set minimum date to today
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById('date').min = today;
+
+            // If no date is selected, default to today
+            if (!document.getElementById('date').value) {
+                document.getElementById('date').value = today;
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initSearchForm);
+    </script>
+</body>
+</html>
