@@ -1,0 +1,62 @@
+<div class="search-form">
+    <form th:action="@{/public/submit}" method="post" onsubmit="return validateForm()" class="search-form__form">
+        <!-- Chọn thông tin -->
+        <div class="search-form__content">
+            <!-- Row 1 -->
+            <div class="search-form__row search-form__row--left">
+                <div class="search-form__group search-form__group--left">
+                    <label for="departure" class="search-form__label">Điểm đi</label>
+                    <div class="search-form__text-input input-search">
+                        <select id="departure" class="form__input input-search__input--go-on" name="departure" >
+                            <option th:value="${deparTure != null} ? ${deparTure.id}  : ''"
+                                    th:text="${deparTure != null} ? ${deparTure.stopName}  : 'Chọn nơi đi'">
+                            </option>
+                            <optgroup th:each="tinhTp : ${listTinhTp}" th:label="${tinhTp.name}">
+                                <option th:each="stop : ${tinhTp.getStops()}"
+                                        th:value="${stop.id}"
+                                        th:text="${stop.stopName}">
+                                </option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <img src="../../icon/switch_location.svg" class="search-form__group--icon switch-icon"
+                     alt="">
+                <div class="search-form__group search-form__group--right">
+                    <label for="destination" class="search-form__label">Điểm đến</label>
+                    <div class="search-form__text-input input-search">
+                        <select  id="destination" class="form__input input-search__input--go-off" name="destination" >
+                            <option th:value="${destinaTion != null} ?  ${destinaTion.id} : ''"
+                                    th:text="${destinaTion != null} ? ${destinaTion.stopName} : 'Chọn nơi đến'">
+                            </option>
+                            <optgroup th:each="tinhTp : ${listTinhTp}" th:label="${tinhTp.name}">
+                                <option th:each="stop : ${tinhTp.getStops()}"
+                                        th:value="${stop.id}"
+                                        th:text="${stop.stopName}">
+                                </option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="separate d-none d-lg-block"></div>
+
+            <!-- Row 2 -->
+            <div class="search-form__row search-form__date">
+                <div class="search-form__group">
+                    <label for="date" class="search-form__label">Ngày đi</label>
+                    <div class="search-form__text-input input-search">
+                        <input type="date" id="date" name="departureDate" placeholder="Chọn ngày đi" required
+                               class="choosedate input-search__input" th:value="${departureDate != null} ?  ${departureDate} : ''">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="search-form__bottom">
+            <button class="search-form__bottom--button btn btn--primary btn--rounded">Tìm chuyến xe</button>
+        </div>
+    </form>
+</div>

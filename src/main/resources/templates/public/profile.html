@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXURY BUS</title>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="76x76" href="../../favicon/logo72x72.png">
+    <link rel="icon" type="image/icon" sizes="32x32" href="../../favicon/logo32x32.png">
+    <link rel="icon" type="image/icon" sizes="16x16" href="../../favicon/logo16x16.png">
+    <link rel="manifest" href="../../favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+
+    <!-- Styles -->
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" href="../../css/main.css">
+
+    <!-- Script -->
+    <script th:src="@{/js/scripts.js}"></script>
+
+</head>
+
+<body>
+<!-- Header -->
+<div th:replace="~{clients/header}"></div>
+
+<a href="#home" class="back-to-top">
+    <img src="../../icon/to-top.svg" alt="">
+</a>
+
+<!-- Main -->
+<main class="profile">
+    <div class="container">
+        <!-- Profile content -->
+        <div class="profile-container">
+            <div class="row gy-md-3">
+                <div class="col-3 col-xl-4 d-lg-none">
+                    <aside class="profile__sidebar">
+                        <!-- Menu 1 -->
+                        <a th:href="@{/user/info}" class="profile-menu">
+                            <img src="../../icon/Profile.svg" alt="" class="profile-menu__icon">
+                            <span class="profile-menu__title">Thông tin tài khoản</span>
+                        </a>
+
+                        <!-- Menu 2 -->
+                        <a th:href="@{/user/history}" class="profile-menu">
+                            <img src="../../icon/History.svg" alt="" class="profile-menu__icon">
+                            <span class="profile-menu__title">Lịch sử mua vé</span>
+                        </a>
+
+                        <!-- Menu 3 -->
+                        <a class="profile-menu">
+                            <img src="../../icon/Address.svg" alt="" class="profile-menu__icon">
+                            <span class="profile-menu__title">Địa chỉ của bạn</span>
+                        </a>
+
+                        <!-- Menu 4 -->
+                        <a class="profile-menu">
+                            <img src="../../icon/Profile.svg" alt="" class="profile-menu__icon">
+                            <span class="profile-menu__title">Đặt lại mật khẩu</span>
+                        </a>
+                        <!-- Menu 5 -->
+                        <a th:href="@{/logout}" class="profile-menu" >
+                            <img src="../../icon/Logout.svg" alt="" class="profile-menu__icon">
+                            <span class="profile-menu__title">Đăng xuất</span>
+                        </a>
+                    </aside>
+                </div>
+                <div class="col-9 col-xl-8 col-lg-12">
+                    <div class="profile-sidebar">
+                        <div class="row gy-3">
+                            <div class="col-12">
+                                <h2 class="profile-sidebar__heading">
+                                    <a th:href="@{/user}">
+                                        <img src="../../icon/arrow-left.svg" alt="" class="icon profile-sidebar__icon">
+                                    </a>
+                                    Thông tin tài khoản
+                                </h2>
+                                <p class="profile-sidebar__desc">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+
+                                <form action="./profile.html" class="form form-card" th:each="user : ${user}">
+                                    <!-- Form row 1 -->
+                                    <div class="form__row">
+                                        <div class="form__group">
+                                            <label for="full-name" class="form__label form-card__label">Username</label>
+                                            <div class="form__text-input">
+                                                <input type="text" th:value="${user.getFullName()}" name="" id="full-name" placeholder="Username"
+                                                       class="form__input" required>
+                                                <img src="../../icon/form-error.svg" alt="" class="form__input-icon-error">
+                                            </div>
+                                            <p class="form__error">Request enter full information</p>
+                                        </div>
+                                        <div class="form__group">
+                                            <label for="email-address" class="form__label form-card__label">Email</label>
+                                            <div class="form__text-input">
+                                                <input type="email" th:value="${user.getEmail()}" name="" id="email-address" autofocus placeholder="Email"
+                                                       class="form__input" required>
+                                                <img src="../../icon/form-error.svg" alt="" class="form__input-icon-error">
+                                            </div>
+                                            <p class="form__error">Request enter full information</p>
+                                        </div>
+                                    </div>
+                                    <!-- Form row 2 -->
+                                    <div class="form__row">
+                                        <div class="form__group">
+                                            <label for="phone-number" class="form__label form-card__label">Phone Number</label>
+                                            <div class="form__text-input">
+                                                <input type="tel" th:value="${user.getPhoneNumber()}" name="" id="phone-number" placeholder="Phone Number"
+                                                       class="form__input" required>
+                                                <img src="../../icon/form-error.svg" alt="" class="form__input-icon-error">
+                                            </div>
+                                            <p class="form__error">Request enter full information</p>
+                                        </div>
+                                        <div class="form__group">
+                                            <label for="password" class="form__label form-card__label">Password</label>
+                                            <div class="form__text-input">
+                                                <input type="password" th:value="${user.getFullName()}" name="" id="password" placeholder="Password" class="form__input"
+                                                       required>
+                                                <img src="../../icon/form-error.svg" alt="" class="form__input-icon-error">
+                                            </div>
+                                            <p class="form__error">Request enter full information</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-card__bottom">
+                                        <a th:href="@{/user}" class="btn btn--text">Hủy</a>
+                                        <button class="btn btn--primary btn--rounded">Cập nhật</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{clients/footer}"></div>
+
+<script>
+    // Back to top
+    let backToTopBtn = document.querySelector('.back-to-top')
+
+    window.onscroll = () => {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            backToTopBtn.style.display = 'flex';
+        } else {
+            backToTopBtn.style.display = 'none';
+        }
+    }
+</script>
+</body>
+
+</html>

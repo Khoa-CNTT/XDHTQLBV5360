@@ -1,0 +1,210 @@
+<body>
+    <header id="header" class="header" >
+        <div class="container">
+            <!-- Logo -->
+            <a id="home" href="/" class="logo top-bar-logo">
+                <img src="../../icon/logo-primary.svg" alt="LUXURY BUS" class="top-bar-logo__img">
+            </a>
+
+            <div class="top-bar">
+                <!-- More -->
+                <button class="top-bar__more d-none d-lg-block js-toggle" toggle-target="#navbar">
+                    <img src="../../icon/more.svg" alt="" class="icon top-bar__more-icon">
+                </button>
+
+                <!-- Actions -->
+                <div class="top-act d-lg-none">
+
+                    <a th:href="@{/login}" class="top-act__sign-up">
+                        <img src="../../icon/person.svg" alt="">
+                        <span class="top-act__title">Đăng nhập/Đăng ký</span>
+                    </a>
+                </div>
+
+                <!-- More -->
+                <a th:href="@{/user/info}" class="top-bar__more d-none d-lg-block">
+                    <img src="../../icon/person.svg" alt="" class="icon top-bar__more-icon">
+                </a>
+            </div>
+
+            <div class="bottom-bar">
+                <!-- Navbar -->
+                <nav class="navbar hide">
+                    <button class="navbar__close-btn js-toggle" toggle-target="#navbar">
+                        <img class="icon" src="../../icon/arrow-left.svg" alt="" />
+                    </button>
+                    <ul class="navbar__list js-dropdown-list">
+                        <li class="navbar__item">
+                            <a href="#!" class="navbar__link active">
+                                Trang chủ
+                            </a>
+                        </li>
+                        <li class="navbar__item">
+                            <a href="#rules" class="navbar__link">
+                                Quy định
+                            </a>
+                        </li>
+                        <li class="navbar__item">
+                            <a href="#routes" class="navbar__link">
+                                Tuyến hoạt động
+                            </a>
+                        </li>
+                        <li class="navbar__item">
+                            <a href="#sales" class="navbar__link">
+                                Khuyến mãi
+                            </a>
+                        </li>
+                        <li class="navbar__item">
+                            <a href="#news" class="navbar__link">
+                                Tin tức
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <style>
+        /* Navbar animation styles */
+        .navbar__link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: #4e73df; /* Primary color, adjust as needed */
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        .navbar__link:hover::after {
+            width: 30%;
+        }
+        
+        .navbar__link.active::after {
+            width: 100%;
+        }
+        
+        /* Smooth transition for active state */
+        .navbar__link.active {
+            font-weight: 600;
+        }
+        
+        /* Animation for click effect */
+        @keyframes linkPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .navbar__link.pulse {
+            animation: linkPulse 0.3s ease;
+        }
+    </style>
+    
+    <script>
+        document.querySelector('.top-bar__more').addEventListener('click', function() {
+            const navbar = document.querySelector('.navbar');
+            // Toggle class hoặc toggle display
+            if (navbar.style.display === 'hide' || navbar.style.display === '') {
+                navbar.classList.toggle("show");
+            }
+            if (navbar.style.display === 'show' || navbar.style.display === '') {
+                navbar.classList.toggle("hide");
+            }
+        });
+        
+        // Add animation to navbar links
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.navbar__link');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Remove active class from all links
+                    navLinks.forEach(item => {
+                        item.classList.remove('active');
+                        item.classList.remove('pulse');
+                    });
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    this.classList.add('pulse');
+                    
+                    // If it's not a page navigation (hash link), prevent default
+                    if (this.getAttribute('href').startsWith('#') && 
+                        this.getAttribute('href') !== '#!') {
+                        e.preventDefault();
+                        
+                        // Smooth scroll to the section
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100, // Offset for header
+                                behavior: 'smooth'
+                            });
+                            
+                            // Close navbar if it's open (mobile view)
+                            const navbar = document.querySelector('.navbar');
+                            if (navbar.classList.contains('show')) {
+                                navbar.classList.remove('show');
+                                navbar.classList.add('hide');
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Set active link based on current scroll position
+            function setActiveNavOnScroll() {
+                const scrollPosition = window.scrollY;
+                
+                // Get all sections that have an ID defined
+                const sections = document.querySelectorAll('section[id]');
+                
+                // Find the section that is currently in view
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 150;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = '#' + section.getAttribute('id');
+                    
+                    if (scrollPosition >= sectionTop && 
+                        scrollPosition < sectionTop + sectionHeight) {
+                        // Remove active class from all links
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                        });
+                        
+                        // Add active class to corresponding nav link
+                        const activeLink = document.querySelector(`.navbar__link[href="${sectionId}"]`);
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+                        }
+                    }
+                });
+                
+                // If at the top of the page, activate the home link
+                if (scrollPosition < 100) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    document.querySelector('.navbar__link[href="#!"]').classList.add('active');
+                }
+            }
+            
+            // Listen for scroll events
+            window.addEventListener('scroll', setActiveNavOnScroll);
+            
+            // Set initial active state
+            setActiveNavOnScroll();
+        });
+    </script>
+</body>

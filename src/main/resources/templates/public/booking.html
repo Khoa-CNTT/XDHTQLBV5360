@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXURY BUS</title>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="76x76" href="../../favicon/logo72x72.png">
+    <link rel="icon" type="image/icon" sizes="32x32" href="../../favicon/logo32x32.png">
+    <link rel="icon" type="image/icon" sizes="16x16" href="../../favicon/logo16x16.png">
+    <link rel="manifest" href="../../favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+
+    <!-- Styles -->
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" href="../../css/main.css">
+
+    <!-- Script -->
+    <script th:src="@{/js/scripts.js}"></script>
+
+</head>
+
+<body>
+<!-- Header -->
+<div th:replace="~{clients/header-logined}"></div>
+
+<a href="#home" class="back-to-top">
+    <img src="../../icon/to-top.svg" alt="">
+</a>
+
+<!-- Main -->
+<main class="container home">
+    <!-- Search tickets - Using the fragment -->
+    <div th:replace="~{fragments/search-form :: searchForm(@{/public/submit})}"></div>
+
+    <!-- Tickets -->
+    <div class="ticket-container ticket-info-content">
+        <!--Error-->
+        <div th:if="${my_error}" class="alert alert-danger col-6 justify-content-center">
+            <span th:text="${my_error}"> </span>
+        </div>
+
+        <!--List-->
+        <div class="ticket-content" th:if="${ListTrip != null}" th:each="tripcard : ${ListTrip}">
+            <div class="ticket-content__header">
+                <div class="ticket-content__heading d-lg-none" th:text="${tripcard.getTripNamel()}"></div>
+                <div class="ticket-content__header--menu d-none d-lg-flex">
+                    <div class="ticket-content__header--content">
+                        <img src="../../icon/back.svg" alt="" class="ticket-content__header--left">
+                        <span class="ticket-content__header--center" th:text="${tripcard.getTripNamel()}">
+                            <br>
+                            <span class="ticket-content__header--text" th:text="${tripcard.getDepartureTime()}"></span>
+                        </span>
+                        <img src="../../icon/edit_filter.svg" alt="" class="ticket-content__header--right">
+                    </div>
+                </div>
+            </div>
+            <div class="ticket-content__list">
+                <!-- Trip 1 -->
+                <div class="ticket-content__container">
+                    <div class="ticket-content__item">
+                        <div class="ticket-content__item--top">
+                            <div class="ticket-content__item--container">
+                                <div class="ticket-content__item--left">
+                                    <div class="ticket-content__item--hour">
+                                        <span class="ticket-content__item--text" th:text="${tripcard.getDepartureTime()}"></span>
+                                        <div class="ticket-content__item--distant">
+                                            <img src="../../icon/pickup.svg" alt="">
+                                            <span class="ticket-content__item--border"></span>
+                                            <span class="ticket-content__item--value">
+                                                8 giờ
+                                            </span>
+                                            <span class="ticket-content__item--border"></span>
+                                            <img src="../../icon/station.svg" alt="">
+                                        </div>
+                                        <span class="ticket-content__item--text" th:text="${tripcard.getArrivalTime()}"></span>
+                                    </div>
+                                    <div class="ticket-content__item--location">
+                                        <div class="ticket-content__item--goon">
+                                            <span class="font-medium" th:text="${tripcard.getDepartureLocation()}"></span>
+                                        </div>
+                                        <div class="ticket-content__item--middle">
+                                            <span class="font-medium" th:text="${tripcard.getTripNamel()}"></span>
+                                        </div>
+                                        <div class="ticket-content__item--gooff">
+                                            <span class="font-medium" th:text="${tripcard.getArrivalLocation()}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ticket-content__item--right d-lg-none">
+                                    <div class="ticket-content__item--dots"></div>
+                                    <span th:text="'Loại xe :  ' +${tripcard.getVehicleCategory()}"></span>
+                                    <div class="ticket-content__item--dots"></div>
+                                    <span class="text-green" th:text="${tripcard.getEmptySeats()+' chỗ trống'}"></span>
+                                    <span class="ticket-content__item--price" th:text="${#numbers.formatCurrency(tripcard.getPrice())}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separate ticket-content__item--divide"></div>
+                        <div class="ticket-content__item--wrap d-none d-lg-flex">
+                            <div class="ticket-content__item--wrap-left">
+                                <div class="ticket-content__item--dots"></div>
+                                <span th:text="'Loại xe : ' +${tripcard.getVehicleCategory()}"></span>
+                                <div class="ticket-content__item--dots"></div>
+                                <span class="text-green" th:text="${tripcard.getEmptySeats()+' chỗ trống'}"></span>
+                            </div>
+                            <span class="ticket-content__item--wrap-right" th:text="${#numbers.formatCurrency(tripcard.getPrice())}"></span>
+                        </div>
+                        <a class="ticket-content__item--bottom d-lg-none" th:href="@{/public/seat(tripId=${tripcard.tripId},departureLocation=${deparTure.getId()},arrivalLocation=${destinaTion.getId()})}">
+                            <button class="ticket-content__item--button btn btn--rounded btn--primary">
+                                Chọn chuyến
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{clients/footer}"></div>
+
+<script>
+    // Back to top
+    let backToTopBtn = document.querySelector('.back-to-top')
+
+    window.onscroll = () => {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            backToTopBtn.style.display = 'flex';
+        } else {
+            backToTopBtn.style.display = 'none';
+        }
+    }
+</script>
+</body>
+
+</html>
