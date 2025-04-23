@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="admin/dashboardLayout.html">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Tables - SB Admin</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+  <div class="card mt-3">
+    <div class="card-header">
+      Thêm mới chuyến đi
+    </div>
+    <div class="card-body">
+      <div class="col-md-6 col-lg-offset-3 mt-20 alert alert-success" th:if="${my_error}" >
+        <span th:text="${my_error}"> </span>
+      </div>
+      <form class="row g-3"  th:action="@{/admin/trip/register}"  th:object="${createTrip}" method="post">
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Xe</label>
+          <select id="carSelect" class="form-select" aria-label="Default select example"  th:field="*{carId}" th:errorclass="is-invalid">
+            <option value="" th:selected="false"> Chọn xe </option>
+            <option th:each="car : ${carList}"
+                    th:value="${car.id}"
+                    th:text="${car.id} + ' - ('  + ${car.name} + ')'"
+                    th:attr="data-typecar=${car.category.getId()}">
+            </option>
+          </select>
+          <div th:if="${#fields.hasErrors('carId')}"  th:errors="*{carId}" class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Tên chuyến đi</label>
+          <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid">
+          <div th:if="${#fields.hasErrors('name')}"  th:errors="*{name}" class="invalid-feedback"></div>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Lịch trình</label>
+          <select id="scheduleSelect" class="form-select" aria-label="Default select example"  th:field="*{scheduleId}" th:errorclass="is-invalid">
+            <option value="0" th:selected="false"> Chọn Lịch trình </option>
+            <option th:each="schedule : ${scheduleList}"
+                    th:value="${schedule.id}"
+                    th:text="${schedule.getScheduleName()}"
+                    th:attr="data-route=${schedule.route.getId()}">
+            </option>
+          </select>
+          <div th:if="${#fields.hasErrors('scheduleId')}"  th:errors="*{scheduleId}" class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-6">
+          <label  class="form-label fw-semibold">Ngày khởi hành</label>
+          <input type="date" class="form-control" id="date"
+                 th:min="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"
+                 th:field="*{startDate}" th:errorclass="is-invalid">
+          <div th:if="${#fields.hasErrors('startDate')}"  th:errors="*{startDate}" class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-6">
+          <label  class="form-label fw-semibold">Ngày đến nơi</label>
+          <input  type="date" class="form-control" id="datei"
+                 th:min="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"
+                 th:field="*{endDate}" th:errorclass="is-invalid">
+          <div th:if="${#fields.hasErrors('endDate')}"  th:errors="*{endDate}" class="invalid-feedback"></div>
+        </div>
+        <div class="col-12">
+          <select id="priceSelectHidden" class="form-select" aria-label="Default select example"  required style="display: none;">
+            <option value="0" th:selected="false"> Chọn giá </option>
+            <option th:each="price : ${priceListList}"
+                    th:value="${price.id}"
+                    th:text="${#numbers.formatCurrency(price.getPrice())} +' - ' +${price.name}"
+                    th:attr="data-route=${price.route.getId()}, data-typecar=${price.category.id}" >
+            </option>
+          </select>
+
+          <label class="form-label fw-semibold">Giá</label>
+          <select id="priceSelect" class="form-select" aria-label="Default select example"  required th:field="*{priceListId}" >
+            <option value="0" th:selected="false"> Chọn giá </option>
+          </select>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Thêm</button>
+          <a th:href="@{/admin/trip}" class="btn btn-primary">hủy</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var carSelect = document.getElementById("carSelect");
+      var scheduleSelect = document.getElementById("scheduleSelect");
+      var priceSelect = document.getElementById("priceSelect");
+
+      // Xử lý sự kiện khi thay đổi chọn xe hoặc lịch trình
+      carSelect.addEventListener("change", updatePriceOptions);
+      scheduleSelect.addEventListener("change", updatePriceOptions);
+
+      function updatePriceOptions() {
+        var selectedCarOption = carSelect.options[carSelect.selectedIndex];
+        var selectedCar = selectedCarOption.getAttribute('data-typecar');
+
+        var selectedScheduleOption = scheduleSelect.options[scheduleSelect.selectedIndex];
+        var selectedScheduleId = selectedScheduleOption.getAttribute('data-route');
+
+        // Lấy danh sách giá tương ứng với xe và lịch trình được chọn
+        var prices = getPriceList(selectedCar, selectedScheduleId);
+
+        // Xóa tất cả các option hiện có
+        priceSelect.innerHTML = '';
+
+        // Thêm các option mới cho danh sách giá
+        prices.forEach(function(price) {
+          var option = document.createElement('option');
+          option.text = price.name;
+          option.value = price.id;
+          priceSelect.add(option);
+        });
+      }
+
+      // Hàm để lấy danh sách giá dựa trên chọn xe và lịch trình
+      function getPriceList(selectedCar, selectedScheduleId) {
+        // Lấy danh sách giá từ dropdown đã được tạo trong template Thymeleaf
+        var priceSelectHidden = document.getElementById("priceSelectHidden");
+        var priceList = priceSelectHidden.querySelectorAll('option');
+        var prices = [];
+
+        // Lọc danh sách giá dựa trên lựa chọn của người dùng
+        priceList.forEach(function(priceOption) {
+          var route = priceOption.getAttribute('data-route');
+          var typeCar = priceOption.getAttribute('data-typecar');
+
+          // Nếu chỉ chọn xe mà không chọn lịch trình
+          if (!selectedScheduleId && typeCar === selectedCar) {
+            prices.push({
+              id: priceOption.value,
+              name: priceOption.text
+            });
+          }
+          // Nếu chỉ chọn lịch trình mà không chọn xe
+          else if (!selectedCar && route === selectedScheduleId) {
+            prices.push({
+              id: priceOption.value,
+              name: priceOption.text
+            });
+          }
+          // Nếu cả hai điều kiện đều đúng
+          else if (selectedCar && selectedScheduleId) {
+            if (route === selectedScheduleId && typeCar === selectedCar) {
+              prices.push({
+                id: priceOption.value,
+                name: priceOption.text
+              });
+            }
+          }
+        });
+
+        return prices;
+      }
+
+      // Gọi hàm updatePriceOptions() khi trang được tải lần đầu
+      updatePriceOptions();
+    });
+
+  </script>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

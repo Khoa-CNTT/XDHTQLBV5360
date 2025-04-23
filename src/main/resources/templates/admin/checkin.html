@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Check-in Vé</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Responsive -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <style>
+    /* Reset margin và padding */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    #container {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    #video-container {
+      position: relative;
+      width: 100%;
+      max-width: 350px;
+      height: auto;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid #ddd;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    #canvas {
+      display: none;
+    }
+
+    #loadingMessage {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+
+    #ticketInfo {
+      display: none;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 5px;
+      text-align: left;
+    }
+
+    #ticketInfo h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    /* Responsive cho iPhone 12 */
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 20px;
+      }
+      input, button {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="container">
+  <h1>Check-in Vé</h1>
+
+  <div id="video-container">
+    <video id="video" playsinline autoplay></video>
+    <canvas id="canvas"></canvas>
+  </div>
+  <p id="loadingMessage">🎥 Vui lòng cho phép truy cập camera...</p>
+  <input type="hidden" id="currentTripCode" th:value="${currentTripCode}" />
+
+  <input type="text" id="idBooking" name="idBooking" placeholder="Nhập hoặc quét mã QR">
+  <button onclick="checkIn()">Check-in</button>
+
+  <div id="result"></div>
+
+  <div id="ticketInfo">
+    <h2>Thông tin vé:</h2>
+    <p><strong>Mã vé:</strong> <span id="ticketCode"></span></p>
+    <p><strong>Tên khách:</strong> <span id="customerName"></span></p>
+    <p><strong>Số ghế:</strong> <span id="seatNumber"></span></p>
+    <p><strong>Chuyến:</strong> <span id="tripName"></span></p>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  function checkIn() {
+    var idBooking = document.getElementById("idBooking").value;
+    var currentTripCode = document.getElementById("currentTripCode").value; // Lấy từ thẻ HTML
+
+    if (!currentTripCode) {
+      displayResult("Vui lòng chọn chuyến xe trước.", "error");
+      return;
+    }
+
+    if (!idBooking) {
+      displayResult("Vui lòng nhập hoặc quét mã vé.", "error");
+      return;
+    }
+
+    fetch("/driver/api/checkin/" + currentTripCode, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ idBooking: idBooking })
+    })
+            .then(response => console.log(response) || response.json())
+            .then(data => {
+              console.log(data);
+              if (data.code === 1000) {
+                displayResult(data.message, "success");
+                displayTicketInfo(data.result);
+              } else {
+                displayResult(data.message, "error");
+                document.getElementById("ticketInfo").style.display = "none";
+              }
+            })
+            .catch(error => {
+              console.error("Error:", error);
+              displayResult("Lỗi: " + error, "error");
+            });
+  }
+  function displayResult(message, type) {
+    var resultDiv = document.getElementById("result");
+    resultDiv.innerText = message;
+    resultDiv.className = type; // Thêm class "success" hoặc "error" để style
+  }
+  function displayTicketInfo(ticket) {
+    if(ticket != null){
+      document.getElementById("ticketInfo").style.display = "block"; // Hiện phần tử chứa thông tin
+      // document.getElementById("ticketCode").innerText = ticket.ticketCode;
+      document.getElementById("customerName").innerText = ticket.customerName;
+      // document.getElementById("seatNumber").innerText = ticket.seatNumber;
+    }
+    // ...
+  }
+  // Phần quét mã QR (không thay đổi)
+  //-------------------------- Phần quét mã QR code ---------------------------------------------------
+  var video = document.getElementById("video");
+  var canvasElement = document.getElementById("canvas");
+  var canvas = canvasElement.getContext("2d");
+  var loadingMessage = document.getElementById("loadingMessage");
+
+  // Hàm vẽ đường thẳng (cho debugging)
+  function drawLine(begin, end, color) {
+    canvas.beginPath();
+    canvas.moveTo(begin.x, begin.y);
+    canvas.lineTo(end.x, end.y);
+    canvas.lineWidth = 4;
+    canvas.strokeStyle = color;
+    canvas.stroke();
+  }
+
+  // Lấy stream từ camera
+  navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}}) // environment: camera sau, user: camera trước
+          .then(function (stream) {
+            video.srcObject = stream;
+            video.play(); // Bắt đầu phát video
+            requestAnimationFrame(tick); // Bắt đầu vòng lặp quét
+          })
+          .catch(function (err) {
+            console.error("An error occurred: " + err);
+            loadingMessage.innerText = "Không thể truy cập camera: " + err;
+          });
+
+  // Vòng lặp quét mã QR
+  function tick() {
+
+    loadingMessage.innerText = "⌛ Đang tải video..."
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      loadingMessage.hidden = true;
+      canvasElement.hidden = false;
+
+
+      canvasElement.height = 225;//video.videoHeight; // Kích thước nhỏ
+      canvasElement.width = 300;//video.videoWidth;   // Kích thước nhỏ
+      canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height); // Vẽ ảnh từ video lên canvas
+      var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height); // Lấy dữ liệu ảnh
+      var code = jsQR(imageData.data, imageData.width, imageData.height, {  // Quét mã QR
+        inversionAttempts: "dontInvert", // Các tùy chọn (nếu cần)
+      });
+
+      if (code) {
+        // Nếu tìm thấy mã QR
+        drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+        drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+        drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+        drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+        document.getElementById("idBooking").value = code.data; // Điền dữ liệu vào ô input
+      }
+    }
+    requestAnimationFrame(tick); // Tiếp tục vòng lặp
+  }
+</script>
+</body>
+</html>
