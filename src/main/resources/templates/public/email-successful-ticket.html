@@ -1,0 +1,54 @@
+<div style =" max-width:600px ;  margin: 0 auto;">
+    <h2><span style="color: #339966;"><strong>XURIBUS</strong></span></h2>
+    <table style="border-collapse: collapse; width: 100.801%; height: 547px;" border="0">
+        <tbody>
+        <tr style="height: 136px;">
+            <td style="width: 105.848%; border-top: 2px solid #2e8b57; border-bottom: 2px solid #2e8b57; height: 136px;" colspan="2">
+                <p>Th&acirc;n gửi&nbsp;<strong th:text="${name}"></strong>,</p>
+                <p>Ch&uacute;c mừng Qu&yacute; kh&aacute;ch đ&atilde; mua v&eacute; th&agrave;nh c&ocirc;ng tr&ecirc;n hệ thống đặt v&eacute; của Hiếu Hoa.</p>
+                <p>Bạn c&oacute; thể <strong>QUẢN L&Yacute; V&Eacute; Đ&Atilde; ĐẶT</strong>&nbsp;tại:&nbsp;<a href="http://localhost:8080/register/showRegisterForm" target="_blank" rel="noopener" data-saferedirecturl="https://www.google.com/url?q=https://khtt.hieuhoaexpress.com/ve/danh-sach-ve/&amp;source=gmail&amp;ust=1713775635551000&amp;usg=AOvVaw1ZuNKd19knH4_YkVht7qz4"><strong>Đ&Acirc;Y</strong></a>. Nếu chưa đăng k&yacute;, Qu&yacute; kh&aacute;ch h&atilde;y đăng k&yacute; bằng&nbsp;<strong>SĐT đặt v&eacute;</strong>&nbsp;ạ.</p>
+            </td>
+        </tr>
+        <tr style="height: 176px;">
+            <td style="width: 32.3591%; height: 244px;"><img th:src="'cid:qrCodeImage'" alt="" width="180" height="180" /></td>
+            <td style="width: 73.4885%; height: 244px; text-align: center; background-color: #f2f2f2;"><strong>TH&Ocirc;NG TIN CHUYẾN ĐI</strong><br />
+                <table style="border-collapse: collapse; width: 98.8367%; height: 204px;" border="0">
+                    <tbody>
+                    <tr style="height: 18px;">
+                        <td style="width: 100%; height: 18px; text-align: justify; padding-left: 15px;">Số điện thoại:&nbsp;<strong th:text="${phoneNumber}"></strong></td>
+                    </tr>
+                    <tr style="height: 18px;">
+                        <td style="width: 100%; height: 18px; text-align: left; padding-left: 15px;">Chuyến xe:&nbsp;<strong th:text="${tripName}"></strong></td>
+                    </tr>
+                    <tr style="height: 18px;">
+                        <td style="width: 100%; height: 18px; text-align: left; padding-left: 15px;">Thời gian chạy:&nbsp;<strong th:text="${departureDate}"></strong> , <strong th:text="${starTime}"></strong></td>
+                    </tr>
+                    <tr style="height: 18px;">
+                        <td style="width: 100%; height: 18px; text-align: left; padding-left: 15px;">Thời gian đ&oacute;n (dự kiến):&nbsp;<strong th:text="${departureTime}"></strong></td>
+                    </tr>
+                    <tr style="height: 18px;">
+                        <td style="width: 100%; height: 18px; text-align: left; padding-left: 15px;">Điểm đ&oacute;n:&nbsp;<strong th:text="${departureLocation}"></strong></td>
+                    </tr>
+                    <tr style="height: 18px;">
+                        <td style="width: 100%; height: 18px; text-align: left; padding-left: 15px;">Điểm trả:&nbsp;<strong th:text="${arrivalLocation}"></strong></td>
+                    </tr>
+                    <tr style="height: 18px;">
+                        <td style="width: 100%; height: 18px; text-align: left; padding-left: 15px;">Số ghế:&nbsp;<strong th:text="${listSeat}"></strong></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr style="height: 36px;">
+            <td style="width: 105.848%; border-top: 2px solid #2e8b57; height: 47px;" colspan="2">
+                <p><strong>Qu&yacute; kh&aacute;ch lưu &yacute;:</strong></p>
+                <ul>
+                    <li>Vui l&ograve;ng bảo mật m&atilde;&nbsp;<strong>QR-Code</strong>&nbsp;để tr&aacute;nh c&aacute;c trường hợp đ&aacute;ng tiếc xảy ra.</li>
+                    <li>Vui l&ograve;ng c&oacute; mặt trước&nbsp;<strong>30 ph&uacute;t</strong>&nbsp;để l&agrave;m thủ tục l&ecirc;n xe.</li>
+                    <li>Đối với c&aacute;c chuyến xe buổi tối xuất ph&aacute;t ở&nbsp;<strong>Đ&agrave; Nẵng</strong>&nbsp;từ&nbsp;<strong>22/12 đến 29/12 (&acirc;m lịch)</strong>, Qu&yacute; kh&aacute;ch&nbsp;<strong>vui l&ograve;ng c&oacute; mặt tại bến l&uacute;c 19h00</strong>&nbsp;để l&agrave;m thủ tục l&ecirc;n xe.</li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

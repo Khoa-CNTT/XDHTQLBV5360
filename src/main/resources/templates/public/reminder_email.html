@@ -1,0 +1,35 @@
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd;">
+        <h2 style="text-align: center; color: #007bff;">Nhắc Nhở Chuyến Xe</h2>
+
+        <p>Kính gửi <strong th:text="${customerName}"></strong>,</p>
+
+        <p>Chúng tôi xin nhắc bạn rằng bạn có chuyến xe  <strong th:text="${tripName}"></strong> sẽ khởi hành vào ngày  <strong th:text="${departureDate}"></strong>, lúc <strong th:text="${starTime}"></strong>. Dưới đây là thông tin chi tiết của chuyến đi:</p>
+
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Điểm khởi hành:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;" th:text="${departureLocation}"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Thời gian đón (dự kiến):</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;" th:text="${departureTime}"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Điểm đến:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;" th:text="${arrivalLocation}"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Số ghế:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;" th:text="${listSeat}"></td>
+            </tr>
+        </table>
+
+        <p>Để đảm bảo hành trình thuận lợi, vui lòng có mặt tại điểm đón ít nhất trước 15 phút. Nếu bạn có bất kỳ thắc mắc nào, đừng ngần ngại liên hệ với chúng tôi qua số điện thoại hỗ trợ trên.</p>
+
+        <p>Chúc bạn một chuyến đi an toàn và thoải mái!</p>
+
+        <p>Trân trọng,</p>
+        <p><strong>Đội ngũ Hỗ trợ Khách Hàng</strong></p>
+    </div>
+</div>
