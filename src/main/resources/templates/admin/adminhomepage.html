@@ -1,26 +1,178 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
-      layout:decorate="admin/dashboardLayout.html">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+    layout:decorate="admin/dashboardLayout.html">
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Tables - SB Admin</title>
+    <title>Dashboard - Bus Ticket System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <link th:href="@{../css/styles.css}" rel="stylesheet" />
 </head>
-<body>
-<div layout:fragment="content">
-    <h1> ADMIN HOME page</h1>
-</div>
-<th:block layout:fragment="script">
-    <!--            bootstrap 5.2.3 js-->
-    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-</th:block>
 
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Dashboard</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item active">Tổng quan hệ thống</li>
+            </ol>
+
+            <!-- Stats Cards Row -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card bg-primary text-white mb-4">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="small text-white-50">Tổng số chuyến xe</div>
+                                <div class="display-6">125</div>
+                            </div>
+                            <div><i class="fas fa-bus fa-2x"></i></div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <a class="small text-white stretched-link" href="/admin/trip">Xem chi tiết</a>
+                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card bg-warning text-white mb-4">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="small text-white-50">Vé đã đặt hôm nay</div>
+                                <div class="display-6">42</div>
+                            </div>
+                            <div><i class="fas fa-ticket-alt fa-2x"></i></div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <a class="small text-white stretched-link" href="/admin/booking">Xem chi tiết</a>
+                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card bg-success text-white mb-4">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="small text-white-50">Doanh thu tháng</div>
+                                <div class="display-6">45.2M</div>
+                            </div>
+                            <div><i class="fas fa-money-bill-wave fa-2x"></i></div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <a class="small text-white stretched-link" href="#">Xem chi tiết</a>
+                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card bg-danger text-white mb-4">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="small text-white-50">Khách hàng mới</div>
+                                <div class="display-6">18</div>
+                            </div>
+                            <div><i class="fas fa-users fa-2x"></i></div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <a class="small text-white stretched-link" href="#">Xem chi tiết</a>
+                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Features Row -->
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-body text-center p-5">
+                            <div class="card-icon text-primary">
+                                <i class="fas fa-car-side"></i>
+                            </div>
+                            <h4 class="card-title">Quản lý chuyến xe</h4>
+                            <p class="card-text">Thêm, sửa, xóa và quản lý tất cả các chuyến xe trong hệ thống.</p>
+                            <a href="/admin/trip" class="btn btn-primary mt-3">Truy cập</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-body text-center p-5">
+                            <div class="card-icon text-success">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <h4 class="card-title">Quản lý đặt vé</h4>
+                            <p class="card-text">Xem và quản lý tất cả các đơn đặt vé của khách hàng.</p>
+                            <a href="/admin/booking" class="btn btn-success mt-3">Truy cập</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-body text-center p-5">
+                            <div class="card-icon text-warning">
+                                <i class="fas fa-qrcode"></i>
+                            </div>
+                            <h4 class="card-title">Check-in vé</h4>
+                            <p class="card-text">Quét mã QR để xác nhận vé cho hành khách lên xe.</p>
+                            <a href="/admin/driver/bus" class="btn btn-warning mt-3">Truy cập</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-history me-1"></i>
+                        Hoạt động gần đây
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary">Xem tất cả</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="#"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold">Đặt vé mới #1234</div>
+                                <div class="small text-muted">Nguyễn Văn A đã đặt vé chuyến Hà Nội - Sài Gòn</div>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">5 phút trước</span>
+                        </a>
+                        <a href="#"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold">Check-in vé #5678</div>
+                                <div class="small text-muted">Trần Thị B đã check-in chuyến Đà Nẵng - Huế</div>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">15 phút trước</span>
+                        </a>
+                        <a href="#"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold">Thêm chuyến xe mới</div>
+                                <div class="small text-muted">Admin đã thêm chuyến xe mới Sài Gòn - Đà Lạt</div>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">1 giờ trước</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </th:block>
 </body>
+
 </html>
