@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="admin/dashboardLayout.html">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Tables - SB Admin</title>
+
+
+<!--    <link th:href="@{../css/styles.css}" rel="stylesheet" />-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+</head>
+<body class="sb-nav-fixed">
+<div layout:fragment="content" class="container">
+    <div class="card mt-3"  >
+        <form class="card-body  d-flex justify-content-between align-items-end  mb-3" action="#" th:action="@{/admin/trip}" method="get">
+            <div class="col-md-3">
+                <label  class="form-label fw-semibold">Ngày khởi hành</label>
+                <input type="date" class="form-control " id="date" name="date" th:value="${date}" style="filter: invert(1);">
+            </div>
+            <div class="col-md-3">
+                <label  class="form-label fw-semibold">Tuyến xe</label>
+                <select class="form-select" name="route" style="filter: invert(1);">
+                    <option value="0" > - tất cả - </option>
+                    <option th:each="route : ${routes}"
+                            th:value="${route.id}"
+                            th:text="${route.getName()}"
+                            th:selected="${ routeInput != null and route.id == routeInput.id }">
+                    </option>
+                </select>
+            </div>
+            <div class="col-4">
+                <label  class="form-label fw-semibold"> </label>
+                <button type="submit" class="btn btn-dark">Tìm</button>
+            </div>
+        </form>
+    </div>
+    <div class="card mt-3">
+        <div class="card-header fw-bold d-flex justify-content-between">
+            <div class="d-flex flex-row mb-3 align-items-center" >
+                <i class="fas fa-table me-1"></i>
+                <p class="m-0"> HÔM NAY <span th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"></span></p>
+            </div>
+
+            <div class="">
+                <a type="button" class="btn btn-primary me-3" th:href="@{/admin/trip/register}">
+                    <i class="fa-solid fa-circle-plus me-2"></i>Thêm chuyến một lần
+                </a>
+
+                <a type="button" class="btn btn-primary" th:href="@{/register/showRegisterForm}">
+                    <i class="fa-solid fa-circle-plus me-2"></i>Thêm chuyến trong pham vi
+                </a>
+            </div>
+        </div>
+        <div class="card-body" >
+            <div class="data_table">
+                <table id="example" class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>CHUYẾN / TUYẾN</th>
+                        <th>BIỂN SỐ XE</th>
+                        <th>KHỞI HÀNH</th>
+                        <th>ĐIỂM ĐẾN</th>
+                        <th>THÔNG TIN BÁN VÉ</th>
+                        <th>CÒN LẠI</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="trip : ${listTrip}">
+                            <td >
+                                <b th:text="${trip.getTripNamel()}"></b>
+                                <p th:text="${trip.getRouteNamel()}"></p>
+                            </td>
+                            <td >
+                                <b th:text="${trip.getVehicle()}"></b>
+                            </td>
+                            <td>
+                                <b th:text="${#temporals.format(trip.getDepartureTime(), 'dd/MM/yyyy')}"></b>
+                                <span th:text="${#temporals.format(trip.getDepartureTime(), 'HH:mm:ss')}"> </span>
+                                <p th:text="${trip.getDepartureLocation()}"></p>
+                            </td>
+                            <td>
+                                <b th:text="${#temporals.format(trip.getArrivalTime(), 'dd/MM/yyyy')}"></b>
+                                <span th:text="${#temporals.format(trip.getArrivalTime(), 'HH:mm:ss')}"> </span>
+                                <p th:text="${trip.getArrivalLocation()}"></p>
+                            </td>
+                            <td>
+                                <span>Giữ chỗ : </span>
+                                <b th:text="${trip.getReservedSeats()}"></b>
+                                <br>
+                                <span>Đã mua : </span>
+                                <b th:text="${trip.getPurchasedSeats()}"></b>
+                            </td>
+                            <td>
+                                <span>Còn lại : </span>
+                                <b th:text="${trip.getEmptySeats()}"></b>
+                            </td>
+                            <td>
+                                <a href="" class="link-dark"><i class="fa-solid fa-pen-to-square fs-5 me-3"></i></a>
+                                <a href="" class="link-dark"><i class="fa-solid fa-trash fs-5 "></i></a>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="Page navigation" th:if="${date == null} and ${routeInput == null}">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/trip(page=1)}">First</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/trip(page=${currentPage - 1})}">Previous</a>
+                    </li>
+                    <!-- Hiển thị "..." nếu có thêm trang ở đầu -->
+                    <li class="page-item" th:if="${startPage > 1}">
+                        <span class="page-link">...</span>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                        th:classappend="${currentPage == i ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/admin/trip(page=${i})}" th:text="${i}"></a>
+                    </li>
+
+                    <!-- Hiển thị "..." nếu có thêm trang ở cuối -->
+                    <li class="page-item" th:if="${endPage < totalPages - 1}">
+                        <span class="page-link">...</span>
+                    </li>
+
+                    <li class="page-item"
+                        th:classappend="${currentPage == totalPages  ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/trip(page=${currentPage + 1})}">Next</a>
+                    </li>
+                    <li class="page-item"
+                        th:classappend="${currentPage == totalPages  ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/trip(page=${totalPages })}">Last</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <!--            bootstrap 5.2.3 js-->
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</th:block>
+
+</body>
+</html>
