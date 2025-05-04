@@ -22,7 +22,8 @@ public interface TripRepository extends JpaRepository<Trip,Integer> {
             ") sd_max ON s.schedule_id = sd_max.schedule_id " +
             "WHERE s.schedule_id = ?1 " +
             "AND DATE(t.start_date) = ?2 " +
-            "AND  NOW() < DATE_SUB(STR_TO_DATE(CONCAT( ?2 , ' ', sd_max.timee), '%Y-%m-%d %H:%i:%s'), INTERVAL 30 MINUTE) ;"
+            "AND t.status = 'BOOKED' " +
+            "AND  NOW() < DATE_SUB(STR_TO_DATE(CONCAT( ?2 , ' ', sd_max.timee), '%Y-%m-%d %H:%i:%s'), INTERVAL 30 MINUTE);"
             , nativeQuery = true)
     List<Trip> findTripsByScheduleAndDepartureDateTimeGreaterThan(int scheduleId, LocalDate startDate);
 
@@ -45,4 +46,11 @@ public interface TripRepository extends JpaRepository<Trip,Integer> {
     // Tìm các chuyến đi bắt đầu vào một ngày cụ thể và theo route
     List<Trip> findByStartDateAndRoute(@Param("startDate") LocalDate startDate,@Param("routeId") int route);
 
+    @Query("SELECT t FROM Trip t WHERE t.car.id = :carId AND t.startDate = :startDate AND t.id <> :tripId AND t.schedule.id = :scheduleId")
+    List<Trip> findTripsByCarAndStartDate(
+            @Param("carId") String carId,
+            @Param("scheduleId") int scheduleId,
+            @Param("startDate") LocalDate startDate,
+            @Param("tripId") Integer tripId
+    );
 }

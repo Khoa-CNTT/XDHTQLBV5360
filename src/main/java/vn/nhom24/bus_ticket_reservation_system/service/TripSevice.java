@@ -25,6 +25,8 @@ public interface TripSevice {
 
     Trip findById(int tripId);
 
+    List<TripAdminDTO> tripAdminDTOConver(List<Trip> trips);
+
     // lấy tripcard hiển thi ra giao diện user
     TripCard getTripCard(Trip trip, int fromId, int toId );
 
@@ -48,4 +50,8 @@ public interface TripSevice {
 
 
     boolean addtrip(CreateTrip createTrip);
+
+    Trip updateTrip(CreateTrip createTrip, int tripId);
+
+    void deleteTrip(int tripId);
 }

@@ -21,7 +21,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         } else if(roles.contains("ROLE_DRIVER")){
             response.sendRedirect("driver");
         } else {
-            response.sendRedirect("user");
+            response.sendRedirect("user/tickets");
         }
     }
 }

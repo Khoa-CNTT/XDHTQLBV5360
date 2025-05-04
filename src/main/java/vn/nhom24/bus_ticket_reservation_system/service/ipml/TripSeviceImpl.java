@@ -1,6 +1,7 @@
 package vn.nhom24.bus_ticket_reservation_system.service.ipml;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,8 +17,10 @@ import vn.nhom24.bus_ticket_reservation_system.enums.SeatStatus;
 import vn.nhom24.bus_ticket_reservation_system.enums.TripStatus;
 import vn.nhom24.bus_ticket_reservation_system.repository.*;
 import vn.nhom24.bus_ticket_reservation_system.service.TripSevice;
+import vn.nhom24.bus_ticket_reservation_system.util.ScheduleUtil;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TripSeviceImpl implements TripSevice {
     @Autowired
     TinhtpRepository tinhtpRepository;
@@ -172,7 +176,7 @@ public class TripSeviceImpl implements TripSevice {
 
     @Override
     public Page<TripAdminDTO> getAll(int pageNo) {
-        int pageSize = 5;
+        int pageSize = 10;
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
 
         List<TripAdminDTO>  list = tripAdminDTOConver(tripRepository.findAll());
@@ -259,6 +263,7 @@ public class TripSeviceImpl implements TripSevice {
 
             tripAdmin.setTripNamel(trip.getName());
             tripAdmin.setTripId(trip.getId());
+            tripAdmin.setTripStatus(trip.getStatus().name());
             tripAdmin.setRouteNamel(trip.getSchedule().getRoute().getName());
             tripAdmin.setDepartureLocation(departure.getStop().getStopName());
             tripAdmin.setArrivalLocation(arrival.getStop().getStopName());
@@ -316,6 +321,47 @@ public class TripSeviceImpl implements TripSevice {
     }
 
     @Override
+    public Trip updateTrip(CreateTrip createTrip, int tripId) {
+        var trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("chuyến xe không tồn tại"));
+        var car = carRepository.findById(createTrip.getCarId())
+                .orElseThrow(() -> new IllegalArgumentException("xe không tồn tại"));
+        var schedule = scheduleRopository.findById(createTrip.getScheduleId())
+                .orElseThrow(() -> new IllegalArgumentException("lịch trình không tồn tại"));
+        var priceList = priceListRepository.findById(createTrip.getPriceListId())
+                .orElseThrow(() -> new IllegalArgumentException("bảng giá không tồn tại"));
+
+
+        List<Trip> conflicts = tripRepository.findTripsByCarAndStartDate(car.getId(),schedule.getId(), createTrip.getStartDate(), tripId);
+
+        if (!conflicts.isEmpty()) {
+            throw new IllegalArgumentException("Xe này đã có chuyến bị trùng thời gian trong ngày " + createTrip.getStartDate());
+        }
+
+        trip.setCar(car);
+        trip.setSchedule(schedule);
+        trip.setPriceList(priceList);
+        trip.setStartDate(createTrip.getStartDate());
+        trip.setEndDate(createTrip.getEndDate());
+        trip.setName(createTrip.getName());
+
+        tripRepository.save(trip);
+
+        return trip;
+    }
+
+    @Override
+    public void deleteTrip(int tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("chuyến xe không tồn tại"));
+        trip.setStatus(TripStatus.CANCELLED);
+
+        trip.getBookings().forEach(booking -> booking.setStatus(BookingStatus.CANCELLED));
+
+        tripRepository.save(trip);
+    }
+
+    @Override
     public List<Tinhtp> findAll() {
         return tinhtpRepository.findAll();
     }
@@ -343,7 +389,9 @@ public class TripSeviceImpl implements TripSevice {
 
     @Override
     public Trip findById(int tripId) {
-        return tripRepository.findById(tripId).get();
+         Trip trip = tripRepository.findById(tripId)
+                 .orElseThrow(() -> new IllegalArgumentException("Chuyến đi không tồn tại"));
+         return trip;
     }
 
 

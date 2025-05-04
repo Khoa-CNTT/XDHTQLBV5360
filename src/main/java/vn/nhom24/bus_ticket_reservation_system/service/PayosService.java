@@ -16,20 +16,28 @@ public class PayosService {
     public PayosService(PayOS payOS) {
         this.payOS = payOS;
     }
-    public String checkout(HttpServletRequest request, String productName, int price ,int bookingId, String paymentType) throws Exception {
+    public String checkout(HttpServletRequest request, String productName, int price ,int bookingId) throws Exception {
 
             String baseUrl = getBaseUrl(request);
             String prcName = productName;
             String description = "Thanh toan don hang";
-            String returnUrl = baseUrl + "/public/payment-return-payos?bookingId=" + bookingId ;
-            String cancelUrl = baseUrl + "/public/payment-return-payos?bookingId=" + bookingId ;
+            String returnUrl = baseUrl + "/public/payment-return-payos?bookingId=" + bookingId +"&&totalAmount=" + price+"&&payName=PAYOS";
+            String cancelUrl = baseUrl + "/public/payment-return-payos?bookingId=" + bookingId +"&&totalAmount=" + price;
             int prcprice = price;
             // Gen order code
             String currentTimeString = String.valueOf(new Date().getTime());
             long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
 
-            ItemData item = ItemData.builder().name(prcName).quantity(1).price(prcprice).build();
-            PaymentData paymentData = PaymentData.builder().orderCode(orderCode).amount(price).description(description)
+            ItemData item = ItemData.builder()
+                    .name(prcName)
+                    .quantity(1)
+                    .price(prcprice)
+                    .build();
+
+            PaymentData paymentData = PaymentData.builder()
+                    .orderCode(orderCode)
+                    .amount(price)
+                    .description(description)
                     .returnUrl(returnUrl).cancelUrl(cancelUrl).item(item).build();
             CheckoutResponseData data = payOS.createPaymentLink(paymentData);
 

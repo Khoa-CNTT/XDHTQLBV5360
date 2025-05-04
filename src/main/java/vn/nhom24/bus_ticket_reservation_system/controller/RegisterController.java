@@ -63,7 +63,7 @@ public class RegisterController {
             return "public/register";
         }
 
-        return "public/confirmation";
+        return "public/confirm";
     }
 
 
@@ -88,7 +88,7 @@ public class RegisterController {
     @GetMapping("/regenerate-otp")
     public String regenerateOtp(@RequestParam String email){
         userSeviceIpml.regenerateOtp(email);
-        return "public/confirmation";
+        return "public/confirm";
     }
 
 }

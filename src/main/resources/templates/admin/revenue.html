@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="admin/dashboardLayout.html">
+<head>
+  <meta charset="UTF-8">
+  <title>Thống kê doanh thu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div layout:fragment="content" class="container-fluid px-4">
+  <!-- Header -->
+  <h1 class="mt-4">Thống kê</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item active">Thống kê</li>
+  </ol>
+
+  <!-- Form lọc -->
+  <form th:action="@{/admin/dashboard}" method="get" class="mb-4 bg-white p-4 rounded shadow">
+    <!-- Hiển thị lỗi -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <div th:if="${not #lists.isEmpty(errors)}" class="alert alert-danger">
+      <ul>
+        <li th:each="error : ${errors}" th:text="${error}"></li>
+      </ul>
+    </div>
+    <div class="row g-3 align-items-end">
+      <!-- Chọn loại thời gian -->
+      <div class="col-md-3">
+        <label class="form-label">Loại thời gian</label>
+        <select name="periodType" class="form-select" id="periodType" th:field="${request.periodType}">
+          <option value="WEEK" th:selected="${request.periodType == 'WEEK'}">Tuần qua</option>
+          <option value="MONTH" th:selected="${request.periodType == 'MONTH'}">Tháng qua</option>
+          <option value="YEAR" th:selected="${request.periodType == 'YEAR'}">Năm qua</option>
+          <option value="SPECIFIC_MONTH" th:selected="${request.periodType == 'SPECIFIC_MONTH'}">Chọn tháng/năm</option>
+          <option value="CUSTOM" th:selected="${request.periodType == 'CUSTOM'}">Tùy chọn ngày</option>
+        </select>
+      </div>
+
+      <!-- Chọn tháng/năm -->
+      <div class="col-md-2 d-none" id="specificMonth">
+        <label class="form-label">Tháng</label>
+        <select name="specificMonth" class="form-select" th:field="${request.specificMonth}">
+          <option th:each="month : ${#numbers.sequence(1,12)}"
+                  th:value="${month}"
+                  th:text="'Tháng ' + ${month}"
+                  th:selected="${request.specificMonth == month}"></option>
+        </select>
+      </div>
+
+      <div class="col-md-2 d-none" id="specificYear">
+        <label class="form-label">Năm</label>
+        <input type="number" name="specificYear" class="form-control"
+               th:value="${request.specificYear}">
+      </div>
+
+      <!-- Tùy chọn ngày -->
+      <div class="col-md-3" id="customDate" >
+        <label class="form-label">Từ ngày</label>
+        <input type="text" name="customStartDate"
+               class="form-control" placeholder="dd-MM-yyyy"
+               th:value="${request.customStartDate}">
+      </div>
+
+      <div class="col-md-3" id="customDateEnd" >
+        <label class="form-label">Đến ngày</label>
+        <input type="text" name="customEndDate"
+               class="form-control" placeholder="dd-MM-yyyy"
+               th:value="${request.customEndDate}">
+      </div>
+
+      <!-- Lọc tuyến đường -->
+      <div class="col-md-3">
+        <label class="form-label">Tuyến đường</label>
+        <select name="selectedRoute" class="form-select" th:field="${request.selectedRoute}">
+          <option value="">Tất cả</option>
+          <option th:each="route : ${routes}"
+                  th:value="${route}"
+                  th:text="${route}"
+                  th:selected="${request.selectedRoute == route}"></option>
+        </select>
+      </div>
+
+      <!-- Nút lọc -->
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Lọc</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Cards tổng quan -->
+  <div class="row mb-4" th:if="${summary != null}"> <!-- Kiểm tra summary không null -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card bg-primary text-white mb-4">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small">Tổng số chuyến xe</div>
+            <!-- Sửa tên thuộc tính/getter và định dạng -->
+            <div class="display-6" th:text="${#numbers.formatDecimal(summary.totalTrips, 0, 'COMMA', 0, 'POINT')}">0</div>
+          </div>
+          <div><i class="fas fa-bus fa-2x"></i></div>
+        </div>
+        <!-- ... card-footer ... -->
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card bg-warning text-white mb-4">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small">Tổng số vé đã bán</div>
+            <!-- Định dạng -->
+            <div class="display-6" th:text="${#numbers.formatDecimal(summary.totalTicket, 0, 'COMMA', 0, 'POINT')}">0</div>
+          </div>
+          <div><i class="fas fa-ticket-alt fa-2x"></i></div>
+        </div>
+        <!-- ... card-footer ... -->
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card bg-success text-white mb-4">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small text-white-50">Tổng doanh thu </div>
+            <!-- Sửa tên thuộc tính/getter và định dạng BigDecimal -->
+            <div class="display-6" th:text="${#numbers.formatDecimal(summary.totalRevenue, 0, 'COMMA', 2, 'POINT')}" >0.00</div>
+          </div>
+          <div><i class="fas fa-money-bill-wave fa-2x"></i></div>
+        </div>
+        <!-- ... card-footer ... -->
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card bg-success text-white mb-4">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small text-white-50">Tổng xe hoạt động</div>
+            <div class="display-6" th:text="${summary.totalCar}" >0</div>
+          </div>
+          <div><i class="fas fa-truck fa-2x"></i></div> <!-- Thay icon nếu muốn -->
+        </div>
+        <!-- ... card-footer ... -->
+      </div>
+    </div>
+  </div>
+  <div th:if="${summary == null}">
+    <p>Không thể tải dữ liệu thống kê tổng hợp.</p>
+  </div>
+
+  <!-- Bảng dữ liệu -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-table me-1"></i>
+      Doanh Thu
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+          <th>Tuyến xe</th>
+          <th>Tổng số chuyến</th>
+          <th>Số vé đã bán</th>
+          <th>Doanh thu</th>
+          <th>Đánh giá trung bình</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="stat : ${stats}">
+          <td th:text="${stat.route}"></td>
+          <td th:text="${stat.totalTrips}"></td>
+          <td th:text="${stat.totalTicket}"></td>
+          <td th:text="${#numbers.formatDecimal(stat.totalRevenue, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></td>
+          <td >
+            <span th:if="${stat.averageRating != null}"
+                  th:text="${#numbers.formatDecimal(stat.averageRating, 1, 1, 'POINT')}">
+                    <!-- Ví dụ: 4.5 -->
+            </span>/5
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const periodType = document.getElementById('periodType');
+
+    const initVisibility = () => {
+      const initialType = periodType.value;
+      toggleVisibility(initialType);
+    };
+
+    const toggleVisibility = (type) => {
+      // Xử lý SPECIFIC_MONTH
+      document.getElementById('specificMonth').classList.toggle('d-none', type !== 'SPECIFIC_MONTH');
+      document.getElementById('specificYear').classList.toggle('d-none', type !== 'SPECIFIC_MONTH');
+
+      // Xử lý CUSTOM
+      document.getElementById('customDate').classList.toggle('d-none', type !== 'CUSTOM');
+      document.getElementById('customDateEnd').classList.toggle('d-none', type !== 'CUSTOM');
+    };
+
+    periodType.addEventListener('change', (e) => {
+      toggleVisibility(e.target.value);
+    });
+
+    // Khởi tạo khi tải trang
+    initVisibility();
+  </script>
+</div>
+
+<!-- Script điều khiển hiển thị -->
+
+</body>
+</html>

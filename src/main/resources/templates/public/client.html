@@ -115,42 +115,26 @@
         </div>
         <div class="home__route">
             <!-- Route 1 -->
-            <article class="route-item" th:each=" province : ${listTinhTp}">
-                <div class="route-item__thumb">
-                    <img loading="lazy" width="360" height="140" decoding="async" src="../../imgs/sg.png" alt=""
-                         class="">
-                </div>
-                <div class="route-item__intro">
-                    <span class="route-item__intro--text">Tuyến xe từ</span>
-                    <br>
-                    <span class="route-item__intro--bold" th:text="${province.getName()}"></span>
-                </div>
-                <div class="route-item__list">
-                    <!-- Item 1 -->
-                    <div class="route-item__item">
-                        <div class="route-item__item--title">
-                            <span class="route-item__item--text" th:text="${province.getName()}"></span>
-                            <span class="route-item__item--price">200.00đ</span>
-                        </div>
-                        <span class="route-item__item--desc">350km - 8 giờ - 21/03/2025</span>
+            <article class="route-item" th:each=" route : ${routes}">
+                <a th:href="@{/public/{routeId}(routeId = ${route.getId()})}">
+                    <div class="route-item__thumb">
+                        <img loading="lazy" width="360" height="140" decoding="async" src="../../imgs/sg.png" alt=""
+                             class="">
                     </div>
-<!--                    &lt;!&ndash; Item 2 &ndash;&gt;-->
-<!--                    <div class="route-item__item">-->
-<!--                        <div class="route-item__item&#45;&#45;title">-->
-<!--                            <span class="route-item__item&#45;&#45;text">Đà Lạt</span>-->
-<!--                            <span class="route-item__item&#45;&#45;price">200.00đ</span>-->
-<!--                        </div>-->
-<!--                        <span class="route-item__item&#45;&#45;desc">350km - 8 giờ - 21/03/2025</span>-->
-<!--                    </div>-->
-<!--                    &lt;!&ndash; Item 3 &ndash;&gt;-->
-<!--                    <div class="route-item__item">-->
-<!--                        <div class="route-item__item&#45;&#45;title">-->
-<!--                            <span class="route-item__item&#45;&#45;text">Đak Lak</span>-->
-<!--                            <span class="route-item__item&#45;&#45;price">200.00đ</span>-->
-<!--                        </div>-->
-<!--                        <span class="route-item__item&#45;&#45;desc">350km - 8 giờ - 21/03/2025</span>-->
-<!--                    </div>-->
-                </div>
+                    <div class="route-item__intro">
+                        <span class="route-item__intro--text">Tuyến xe từ</span>
+                        <br>
+                        <span class="route-item__intro--bold" th:text="${route.getName()}"></span>
+                    </div>
+                    <div class="route-item__list">
+                        <!-- Item 1 -->
+                        <div class="route-item__item">
+                            <div class="route-item__item--title">
+                                <span class="route-item__item--text" >Hoạt động</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
             </article>
         </div>
     </section>

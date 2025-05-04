@@ -433,7 +433,7 @@
 
                         <!-- Pay -->
                         <div class="choose-payment flex items-center p-6">
-                            <div class="flex-1">
+                            <div class="flex-1" >
                                 <p class="ms-0 fw-semibold">Chọn hình thức thanh toán</p>
 
                                 <div class="form-check">
@@ -499,7 +499,7 @@
 </main>
 
 <!-- Footer -->
-<div th:replace="~{clients/footer}"></div>
+<div th:replace="~{public/footer}"></div>
 
 <script>
     const seats = document.querySelectorAll(".seat_ticket");
@@ -541,6 +541,8 @@
 
             updatePriceDisplay(tongTien);
             totalAmount.value = tongTien;
+
+            Console.log("tong tien " + selectedSeat);
         });
     });
 
@@ -584,6 +586,8 @@
             alert("Vui lòng chọn ghế .");
             return false; // Ngăn chặn việc submit form
         }
+
+
 
         return true; // Cho phép submit form nếu có ít nhất một checkbox được chọn
     }
