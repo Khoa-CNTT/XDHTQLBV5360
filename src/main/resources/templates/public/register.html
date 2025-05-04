@@ -11,8 +11,8 @@
     <link rel="icon" type="image/icon" sizes="32x32" href="../../favicon/logo32x32.png">
     <link rel="icon" type="image/icon" sizes="16x16" href="../../favicon/logo16x16.png">
     <link rel="manifest" href="../../favicon/site.webmanifest">
-    <meta name="msapplication-TileColor" content="#da532c" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="msapplication-TileColor" content="#da532c"/>
+    <meta name="theme-color" content="#ffffff"/>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
           rel="stylesheet">
 
     <!-- Icon -->
-    <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
+    <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet"/>
 
     <!-- Styles -->
     <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" href="../../css/main.css">
@@ -87,54 +87,67 @@
             <div class="auth__content-inner">
                 <h1 class="auth__heading">Tạo tài khoản</h1>
 
-                <div th:if="${error}" class="alert alert-danger">
-                    <span style="color: red" th:text="${error}" > </span>
+                <div th:if="${my_error}" style="
+                color: #055160; /* Màu chữ xanh dương đậm */
+                background-color: #cff4fc; /* Màu nền xanh dương nhạt */
+                border-color: #b6effb;
+                width: 100%;
+                padding: 1rem; /* Khoảng đệm bên trong */
+                margin-bottom: 1rem; /* Khoảng cách với phần tử bên dưới */
+                border: 1px solid transparent; /* Viền trong suốt ban đầu */
+                border-radius: 0.25rem; /* Bo góc nhẹ */
+                font-family: sans-serif; /* Font chữ cơ bản */
+                font-size: 20px;" th:text="${my_error}">
                 </div>
 
-                <form  th:action="@{/register/process}"
-                       th:object="${registerUser}" method="post"  class="form auth__form">
+                <form th:action="@{/register/process}"
+                      th:object="${registerUser}" method="post" class="form auth__form">
                     <div class="form__group">
                         <div class="form__text-input flex">
-                            <input type="text" name="username" id="inputFullName" placeholder="Tên đầy đủ" th:field="*{fullName}" class="form__input form-control" required
+                            <input type="text" name="username" id="inputFullName" placeholder="Tên đầy đủ"
+                                   th:field="*{fullName}" class="form__input form-control" required
                                    autofocus>
-                            <div th:if="${#fields.hasErrors('fullName')}">
-                                <ul>
-                                    <li th:each = "e: ${#fields.errors('fullName')}"  th:text="${e}"></li>
-                                </ul>
-                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors('fullName')}">
+                            <ul>
+                                <li th:each="e: ${#fields.errors('fullName')}" th:text="${e}"></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="form__group">
                         <div class="form__text-input flex">
-                            <input type="text" name="username" id="inputPhoneNumber" th:field="*{phoneNumber}" placeholder="Nhập số điện thoại" class="form__input form-control" required
+                            <input type="text" name="username" id="inputPhoneNumber" th:field="*{phoneNumber}"
+                                   placeholder="Nhập số điện thoại" class="form__input form-control" required
                                    autofocus>
-                            <div th:if="${#fields.hasErrors('phoneNumber')}">
-                                <ul>
-                                    <li th:each = "e: ${#fields.errors('phoneNumber')}"  th:text="${e}"></li>
-                                </ul>
-                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors('phoneNumber')}">
+                            <ul>
+                                <li th:each="e: ${#fields.errors('phoneNumber')}" th:text="${e}"></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="form__group">
                         <div class="form__text-input flex">
-                            <input type="email" name="inputEmail" id="inputEmail" th:field="*{email}" placeholder="Nhập email" class="form__input form-control" required
+                            <input type="email" name="inputEmail" id="inputEmail" th:field="*{email}"
+                                   placeholder="Nhập email" class="form__input form-control" required
                                    autofocus>
-                            <div th:if="${#fields.hasErrors('email')}">
-                                <ul>
-                                    <li th:each = "e: ${#fields.errors('email')}"  th:text="${e}"></li>
-                                </ul>
-                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors('email')}">
+                            <ul>
+                                <li th:each="e: ${#fields.errors('email')}" th:text="${e}"></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="form__group">
                         <div class="form__text-input">
-                            <input type="password" th:field="*{passWord}" name="password" id="inputPassword" placeholder="Mật khẩu" class="form__input" required
+                            <input type="password" th:field="*{passWord}" name="password" id="inputPassword"
+                                   placeholder="Mật khẩu" class="form__input" required
                                    minlength="6">
-                            <div th:if="${#fields.hasErrors('passWord')}">
-                                <ul>
-                                    <li th:each = "e: ${#fields.errors('passWord')}"  th:text="${e}"></li>
-                                </ul>
-                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors('passWord')}">
+                            <ul>
+                                <li th:each="e: ${#fields.errors('passWord')}" th:text="${e}"></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="form__group auth__btn-group">

@@ -200,9 +200,10 @@
   function displayTicketInfo(ticket) {
     if(ticket != null){
       document.getElementById("ticketInfo").style.display = "block"; // Hiện phần tử chứa thông tin
-      // document.getElementById("ticketCode").innerText = ticket.ticketCode;
+      document.getElementById("ticketCode").innerText = ticket.bookingId;
       document.getElementById("customerName").innerText = ticket.customerName;
-      // document.getElementById("seatNumber").innerText = ticket.seatNumber;
+      document.getElementById("seatNumber").innerText = ticket.listSeat;
+      document.getElementById("tripName").innerText = ticket.tripName;
     }
     // ...
   }

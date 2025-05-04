@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import vn.nhom24.bus_ticket_reservation_system.DTO.BookingDTO;
 import vn.nhom24.bus_ticket_reservation_system.entity.Booking;
 import vn.nhom24.bus_ticket_reservation_system.enums.BookingStatus;
+import vn.nhom24.bus_ticket_reservation_system.enums.TripStatus;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,7 +18,7 @@ public interface BookingSevice {
     List<Booking> searchBookingsByKeyword(String keyword);
     public List<Booking> getAll();
 
-    List<Booking> findPaidOrBookedByEmail(String phoneNumber);
+    List<Booking> findPaidOrBookedByEmail(String phoneNumber , List<BookingStatus> bookingStatus, TripStatus tripStatus);
     public Booking getBookingById(int bookingId);
 
     public List<Booking> findByPhoneNumber(String phone);
@@ -28,4 +29,6 @@ public interface BookingSevice {
     BookingDTO findBookingById(int id) throws IOException, WriterException;
 
     BookingDTO checkInTicket(String idBooking, String currentTripCode) throws IOException, WriterException;
+
+    List<Booking> findByTripId(int id);
 }

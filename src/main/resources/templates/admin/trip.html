@@ -16,8 +16,13 @@
           integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 </head>
 <body class="sb-nav-fixed">
-<div layout:fragment="content" class="container">
-    <div class="card mt-3"  >
+<div layout:fragment="content" class="container-fluid px-4">
+    <h1 class="mt-4">Quản lý chuyến xe</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+        <li class="breadcrumb-item active">Quản lý chuyến xe</li>
+    </ol>
+    <div class="card my-3"  >
         <form class="card-body  d-flex justify-content-between align-items-end  mb-3" action="#" th:action="@{/admin/trip}" method="get">
             <div class="col-md-3">
                 <label  class="form-label fw-semibold">Ngày khởi hành</label>
@@ -40,7 +45,7 @@
             </div>
         </form>
     </div>
-    <div class="card mt-3">
+    <div class="card my-3">
         <div class="card-header fw-bold d-flex justify-content-between">
             <div class="d-flex flex-row mb-3 align-items-center" >
                 <i class="fas fa-table me-1"></i>
@@ -64,6 +69,7 @@
                     <tr>
                         <th>CHUYẾN / TUYẾN</th>
                         <th>BIỂN SỐ XE</th>
+                        <th>TRẠNG THÁI</th>
                         <th>KHỞI HÀNH</th>
                         <th>ĐIỂM ĐẾN</th>
                         <th>THÔNG TIN BÁN VÉ</th>
@@ -79,6 +85,9 @@
                             </td>
                             <td >
                                 <b th:text="${trip.getVehicle()}"></b>
+                            </td>
+                            <td >
+                                <b th:text="${trip.getTripStatus()}"></b>
                             </td>
                             <td>
                                 <b th:text="${#temporals.format(trip.getDepartureTime(), 'dd/MM/yyyy')}"></b>
@@ -102,8 +111,13 @@
                                 <b th:text="${trip.getEmptySeats()}"></b>
                             </td>
                             <td>
-                                <a href="" class="link-dark"><i class="fa-solid fa-pen-to-square fs-5 me-3"></i></a>
-                                <a href="" class="link-dark"><i class="fa-solid fa-trash fs-5 "></i></a>
+                                <th:block th:if="${trip.getTripStatus() eq 'RUNNING' or trip.getTripStatus() eq 'COMPLETE' or trip.getTripStatus() eq 'BOOKED'}">
+                                    <a title="Quản lý chuyến xe" th:href="@{/admin/tripdetail(tripId=${trip.getTripId()})}" class="link-dark"><i class="fa-solid fa-gear fs-5 me-3" ></i></a>
+                                </th:block>
+                                <a title="Xem chi tiết chuyến xe" th:href="@{/admin/trip/{tripId}/detail(tripId=${trip.getTripId()})}" class="link-dark"><i class="fa-solid fa-table-list fs-5 me-3"></i></a>
+                                <th:block th:if="${trip.getTripStatus() eq 'BOOKED'}">
+                                    <a title="Chỉnh sửa chuyến xe" th:href="@{/admin/trip/{tripId}(tripId=${trip.getTripId()})}" class="link-dark"><i class="fa-solid fa-pen-to-square fs-5 me-3"></i></a>
+                                </th:block>
                             </td>
                         </tr>
 

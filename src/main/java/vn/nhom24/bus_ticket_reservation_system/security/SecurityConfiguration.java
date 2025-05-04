@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                 configurer->configurer
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/driver/**").hasAnyRole("DRIVER","ADMIN")
+                        .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().permitAll()
         ).formLogin(
                 form->form.loginPage("/login")

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.ResponseBody;
 import vn.nhom24.bus_ticket_reservation_system.entity.Booking;
 import vn.nhom24.bus_ticket_reservation_system.enums.BookingStatus;
+import vn.nhom24.bus_ticket_reservation_system.enums.TripStatus;
 
 import java.util.List;
 
@@ -17,8 +18,13 @@ public interface BookingReposity extends JpaRepository<vn.nhom24.bus_ticket_rese
 
     Page<Booking> findAllByOrderByDateCreatedDesc(Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE b.email = :email AND b.status IN (:statuses)")
-    List<Booking> findByEmailAndStatusIn(@Param("email") String email, @Param("statuses") List<BookingStatus> statuses);
+    @Query("SELECT b " +
+            "FROM Booking b " +
+            "JOIN Trip t on t.id = b.trip.id " +
+            "WHERE b.email = :email " +
+            "AND t.tripStatus = :status " +
+            "AND b.status IN (:statuses)")
+    List<Booking> findByEmailAndStatusIn(@Param("email") String email, @Param("statuses") List<BookingStatus> statuses, @Param("status") TripStatus status);
 
     List<Booking> findByPhoneNumber(String phoneNumber);
 
@@ -40,4 +46,6 @@ public interface BookingReposity extends JpaRepository<vn.nhom24.bus_ticket_rese
     List<Integer> getBookingsForTripsStartingInNext24Hours();
 
     Booking findByBookingCode(String bookingCode);
+
+    List<Booking> findByTripId(int id);
 }

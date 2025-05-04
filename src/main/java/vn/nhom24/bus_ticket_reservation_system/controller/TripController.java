@@ -53,7 +53,7 @@ public class TripController {
         if(deparTure == null || destinaTion == null){
             myError = "Điểm dừng không hợp lệ";
             model.addAttribute("my_error",myError);
-            return "public/search-schedule";
+            return "public/booking";
         }
 
         // dữ liệu cho form search để search lại
@@ -71,7 +71,7 @@ public class TripController {
         if(tripCards.isEmpty()){
             myError = "Không có chuyến xe phù hợp hoặc đã hết chỗ";
             model.addAttribute("my_error",myError);
-            return "public/search-schedule";
+            return "public/booking";
         }
 
 
@@ -82,6 +82,6 @@ public class TripController {
             System.out.println(tripCard.toString());
         });
 
-        return "public//search-schedule";
+        return "public/booking";
     }
 }

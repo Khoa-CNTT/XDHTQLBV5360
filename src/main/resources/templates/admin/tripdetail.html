@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="admin/dashboardLayout.html">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Tables - SB Admin</title>
+</head>
+<body>
+<div layout:fragment="content" >
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="data_table">
+        <table id="example" class="table ">
+          <thead class="table-dark">
+          <tr>
+            <th>MÃ</th>
+            <th>THÔNG TIN CÁ NHÂN</th>
+            <th>KHỞI HÀNH</th>
+            <th>ĐIỂM ĐẾN</th>
+            <th>GHẾ NGỒI</th>
+            <th>TRẠNG THÁI</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="booking : ${bookings}"
+              th:classappend="${booking.status.getStatus() == 'PENDING' ? 'bg-warning bg-opacity-25 ' :
+                            (booking.status.getStatus() == 'CANCELLED' ? 'bg-danger bg-opacity-25 ' :
+                            (booking.status.getStatus() == 'PAID' ? 'bg-success bg-opacity-25 ' : 'bg-primary bg-opacity-25'))}"
+          >
+            <td>
+              <p>Mã: <span class="m-0" th:text="${booking.getId()}"></span></p>
+              <p class="m-0" th:text="${#temporals.format(booking.getDateCreated(), 'dd/MM/yyyy')}"></p>
+              <p class="m-0" th:text="${#temporals.format(booking.getDateCreated(), 'HH:mm:ss')}"></p>
+            </td>
+            <td>
+              <b th:text="${booking.getPhoneNumber() != null ? booking.getPhoneNumber() : '&nbsp;'}"></b>
+              <p class="m-0 fw-bold"
+                 th:text="${booking.getFullName() != null ? booking.getFullName() : '&nbsp;'}"></p>
+              <p class="m-0" th:text="${booking.getEmail() != null ? booking.getEmail() : '&nbsp;'}"></p>
+            </td>
+            <td>
+              <b th:text="${booking.getDeparture().getStopName() != null ? booking.getDeparture().getStopName() : '&nbsp;'}"></b>
+            </td>
+            <td>
+              <b th:text="${booking.getArrival().getStopName() != null ? booking.getArrival().getStopName() : '&nbsp;'}"></b>
+            </td>
+            <td>
+              <b>
+              <span th:each="ticket : ${booking.getTickets()}">
+                <span th:text="${ticket.getSeatName() != null ? ticket.getSeatName() : '&nbsp;'}"></span>,
+              </span>
+              </b>
+            </td>
+            <td>
+              <b th:text="${booking.getStatus().getDisplayName()}"></b>
+            </td>
+            <td>
+              <th:block th:if="${booking.status.getStatus() eq 'PENDING'}">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal"
+                        th:attr="data-id=${booking.id},data-tripId=${trip.getId()}"  data-action="confirm">
+                  <i class="fa-solid fa-check fs-5"></i>
+                </button>
+              </th:block>
+
+              <!-- Nút Hủy -->
+              <th:block th:if="${booking.status.getStatus() ne 'CANCELLED'}">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal"
+                        th:attr="data-id=${booking.id},data-tripId=${trip.getId()}" data-action="cancel">
+                  <i class="fa-solid fa-xmark fs-5"></i>
+                </button>
+              </th:block>
+            </td>
+          </tr>
+          </tbody>
+
+          <!-- Modal Xác nhận Hủy -->
+          <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalLabel">Xác nhận thao tác</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body" id="modalMessage">
+                  Bạn có chắc chắn muốn thực hiện thao tác này?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+                  <a id="confirmBtn" class="btn btn-primary">Xác nhận</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script>
+            const modal = document.getElementById('myModal');
+            modal.addEventListener('show.bs.modal', function (event) {
+              const button = event.relatedTarget;
+              const bookingId = button.getAttribute('data-id');
+              const action = button.getAttribute('data-action');
+              const tripId = button.getAttribute('data-tripId');
+
+              const confirmBtn = modal.querySelector('#confirmBtn');
+              const modalMessage = modal.querySelector('#modalMessage');
+
+              // Gán đường dẫn động
+              confirmBtn.href = `/admin/trip/updateStatus?id=${bookingId}&action=${action}&tripId=${tripId}`;
+
+              // Gán nội dung khác nhau tùy action
+              if (action === 'confirm') {
+                modalMessage.textContent = 'Bạn có chắc chắn muốn xác nhận vé này không?';
+                confirmBtn.className = 'btn btn-success';
+                confirmBtn.textContent = 'Xác nhận';
+              } else if (action === 'cancel') {
+                modalMessage.textContent = 'Bạn có chắc chắn muốn hủy vé này không?';
+                confirmBtn.className = 'btn btn-danger';
+                confirmBtn.textContent = 'Hủy vé';
+              }
+            });
+          </script>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var carSelect = document.getElementById("carSelect");
+      var scheduleSelect = document.getElementById("scheduleSelect");
+      var priceSelect = document.getElementById("priceSelect");
+
+      // Xử lý sự kiện khi thay đổi chọn xe hoặc lịch trình
+      carSelect.addEventListener("change", updatePriceOptions);
+      scheduleSelect.addEventListener("change", updatePriceOptions);
+
+      function updatePriceOptions() {
+        var selectedCarOption = carSelect.options[carSelect.selectedIndex];
+        var selectedCar = selectedCarOption.getAttribute('data-typecar');
+
+        var selectedScheduleOption = scheduleSelect.options[scheduleSelect.selectedIndex];
+        var selectedScheduleId = selectedScheduleOption.getAttribute('data-route');
+
+        // Lấy danh sách giá tương ứng với xe và lịch trình được chọn
+        var prices = getPriceList(selectedCar, selectedScheduleId);
+
+        // Xóa tất cả các option hiện có
+        priceSelect.innerHTML = '';
+
+        // Thêm các option mới cho danh sách giá
+        prices.forEach(function(price) {
+          var option = document.createElement('option');
+          option.text = price.name;
+          option.value = price.id;
+          priceSelect.add(option);
+        });
+      }
+
+      // Hàm để lấy danh sách giá dựa trên chọn xe và lịch trình
+      function getPriceList(selectedCar, selectedScheduleId) {
+        // Lấy danh sách giá từ dropdown đã được tạo trong template Thymeleaf
+        var priceSelectHidden = document.getElementById("priceSelectHidden");
+        var priceList = priceSelectHidden.querySelectorAll('option');
+        var prices = [];
+
+        // Lọc danh sách giá dựa trên lựa chọn của người dùng
+        priceList.forEach(function(priceOption) {
+          var route = priceOption.getAttribute('data-route');
+          var typeCar = priceOption.getAttribute('data-typecar');
+
+          // Nếu chỉ chọn xe mà không chọn lịch trình
+          if (!selectedScheduleId && typeCar === selectedCar) {
+            prices.push({
+              id: priceOption.value,
+              name: priceOption.text
+            });
+          }
+          // Nếu chỉ chọn lịch trình mà không chọn xe
+          else if (!selectedCar && route === selectedScheduleId) {
+            prices.push({
+              id: priceOption.value,
+              name: priceOption.text
+            });
+          }
+          // Nếu cả hai điều kiện đều đúng
+          else if (selectedCar && selectedScheduleId) {
+            if (route === selectedScheduleId && typeCar === selectedCar) {
+              prices.push({
+                id: priceOption.value,
+                name: priceOption.text
+              });
+            }
+          }
+        });
+
+        return prices;
+      }
+
+      // Gọi hàm updatePriceOptions() khi trang được tải lần đầu
+      updatePriceOptions();
+    });
+
+  </script>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

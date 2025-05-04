@@ -54,14 +54,12 @@
         <div class="col-md-6">
           <label  class="form-label fw-semibold">Ngày khởi hành</label>
           <input type="date" class="form-control" id="date"
-                 th:min="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"
                  th:field="*{startDate}" th:errorclass="is-invalid">
           <div th:if="${#fields.hasErrors('startDate')}"  th:errors="*{startDate}" class="invalid-feedback"></div>
         </div>
         <div class="col-md-6">
           <label  class="form-label fw-semibold">Ngày đến nơi</label>
           <input  type="date" class="form-control" id="datei"
-                 th:min="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"
                  th:field="*{endDate}" th:errorclass="is-invalid">
           <div th:if="${#fields.hasErrors('endDate')}"  th:errors="*{endDate}" class="invalid-feedback"></div>
         </div>

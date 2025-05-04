@@ -27,6 +27,7 @@ public class HomeController {
 
         model.addAttribute("listTinhTp",tinhtps);
 
+
         model.addAttribute("routes" , routes);
         return "public/client";
     }

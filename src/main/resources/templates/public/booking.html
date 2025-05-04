@@ -30,7 +30,7 @@
 
 <body>
 <!-- Header -->
-<div th:replace="~{clients/header-logined}"></div>
+<div th:replace="~{public/header-logined}"></div>
 
 <a href="#home" class="back-to-top">
     <img src="../../icon/to-top.svg" alt="">
@@ -44,29 +44,17 @@
     <!-- Tickets -->
     <div class="ticket-container ticket-info-content">
         <!--Error-->
-        <div th:if="${my_error}" class="alert alert-danger col-6 justify-content-center">
+        <div th:if="${my_error}" class="custom-alert">
             <span th:text="${my_error}"> </span>
         </div>
 
         <!--List-->
-        <div class="ticket-content" th:if="${ListTrip != null}" th:each="tripcard : ${ListTrip}">
-            <div class="ticket-content__header">
-                <div class="ticket-content__heading d-lg-none" th:text="${tripcard.getTripNamel()}"></div>
-                <div class="ticket-content__header--menu d-none d-lg-flex">
-                    <div class="ticket-content__header--content">
-                        <img src="../../icon/back.svg" alt="" class="ticket-content__header--left">
-                        <span class="ticket-content__header--center" th:text="${tripcard.getTripNamel()}">
-                            <br>
-                            <span class="ticket-content__header--text" th:text="${tripcard.getDepartureTime()}"></span>
-                        </span>
-                        <img src="../../icon/edit_filter.svg" alt="" class="ticket-content__header--right">
-                    </div>
-                </div>
-            </div>
-            <div class="ticket-content__list">
+        <div class="ticket-content" >
+            <div class="ticket-content__list" th:if="${ListTrip != null}" th:each="tripcard : ${ListTrip}">
                 <!-- Trip 1 -->
                 <div class="ticket-content__container">
                     <div class="ticket-content__item">
+                        <div class="ticket-content__heading d-lg-none" th:text="${tripcard.getTripNamel()}"></div>
                         <div class="ticket-content__item--top">
                             <div class="ticket-content__item--container">
                                 <div class="ticket-content__item--left">
@@ -100,7 +88,7 @@
                                     <span th:text="'Loại xe :  ' +${tripcard.getVehicleCategory()}"></span>
                                     <div class="ticket-content__item--dots"></div>
                                     <span class="text-green" th:text="${tripcard.getEmptySeats()+' chỗ trống'}"></span>
-                                    <span class="ticket-content__item--price" th:text="${#numbers.formatCurrency(tripcard.getPrice())}"></span>
+                                    <span class="ticket-content__item--price" th:text="${#numbers.formatDecimal(tripcard.getPrice(), 0, 'COMMA', 0, 'POINT') + ' VND'}"></span>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +116,7 @@
 </main>
 
 <!-- Footer -->
-<div th:replace="~{clients/footer}"></div>
+<div th:replace="~{public/footer}"></div>
 
 <script>
     // Back to top

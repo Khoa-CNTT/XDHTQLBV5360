@@ -2481,7 +2481,7 @@ b, strong {
 
 .ticket-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 24px;
 }
 
@@ -4800,3 +4800,21 @@ select:invalid {
     padding: 20px;
     margin-bottom: 20px;
 }
+
+.custom-alert {
+    background-color: #f8d7da; /* nền đỏ nhạt */
+    color: #721c24;             /* màu chữ đỏ đậm */
+    padding: 15px;              /* khoảng cách bên trong */
+    margin: 10px auto;          /* tự căn giữa và thêm khoảng cách ngoài */
+    border: 1px solid #f5c6cb;  /* viền đỏ nhạt */
+    border-radius: 4px;         /* bo góc nhẹ */
+    width: 100%;                 /* chiếm khoảng nửa màn hình => tương đương col-6 */
+    display: flex;
+    justify-content: center;    /* căn giữa nội dung theo chiều ngang */
+    align-items: center;        /* căn giữa nội dung theo chiều dọc nếu có chiều cao cố định */
+    text-align: center;         /* căn giữa chữ */
+    box-sizing: border-box;     /* tính padding vào width */
+}
+
+
+

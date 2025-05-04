@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class TripAdminDTO {
     private int tripId;
+    private String tripStatus;
     private String tripNamel; // tên chuyến đi
     private String routeNamel; // tên tuyến đi
     private String departureLocation ; // Điểm xuất phát

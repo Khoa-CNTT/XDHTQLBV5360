@@ -6,6 +6,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -21,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class EmailSeviceIpml implements EmailSevice {
     public static final String UTF_8_ENCODING = "UTF-8";
@@ -61,6 +63,7 @@ public class EmailSeviceIpml implements EmailSevice {
 
             String text = templateEngine.process(getTemplateName(emailType), context);
 
+
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);
 
@@ -69,6 +72,10 @@ public class EmailSeviceIpml implements EmailSevice {
             helper.setFrom(fromEmail);
             helper.setTo(to);
             helper.setText(text, true);
+
+            info.forEach( (key, value) -> {;
+                System.out.println(key + " : " + value);
+            });
 
             if (info.containsKey("bookingCode")) {
                 String bookingCode = (String) info.get("bookingCode");
@@ -83,6 +90,7 @@ public class EmailSeviceIpml implements EmailSevice {
             }
 
             emailSender.send(message);
+
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }

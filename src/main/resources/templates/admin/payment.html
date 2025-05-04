@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="admin/dashboardLayout.html">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Tables - SB Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.2/css/buttons.dataTables.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+</head>
+<body class="sb-nav-fixed">
+<div layout:fragment="content" >
+    <div class="card my-3">
+        <div class="card-header fw-bold d-flex justify-content-between">
+            <div class="d-flex flex-row mb-3 align-items-center" >
+                <i class="fas fa-table me-1"></i>
+                <p class="m-0"> HÔM NAY <span th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"></span></p>
+            </div>
+            <div class="">
+                <p class="btn-danger me-3" >
+                    Trạng thái chuyến xe : <span style="color: red" th:text="${trip.getTripStatus().getDisplayName()}"></span>
+                </p>
+            </div>
+            <div class="">
+                <form th:action="@{/admin/trip/{tripId}/updateStatus(tripId=${trip.getId()})}" method="POST" style="display: inline;"
+                      th:if="${trip.getTripStatus().getStatus() eq 'BOOKED'}"> <!-- Chỉ hiện khi PENDING -->
+                    <input type="hidden" name="action" value="start">
+                    <button type="submit" class="btn btn-success me-3"
+                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận thanh toán này?');"> <!-- Hỏi xác nhận -->
+                        Xác nhận khởi hành
+                    </button>
+                </form>
+                <form th:action="@{/admin/trip/{tripId}/updateStatus(tripId=${trip.getId()})}" method="POST" style="display: inline;"
+                      th:if="${trip.getTripStatus().getStatus() eq 'RUNNING'}"> <!-- Chỉ hiện khi PENDING -->
+                    <input type="hidden" name="action" value="complete">
+                    <button type="submit" class="btn btn-success me-3"
+                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận thanh toán này?');"> <!-- Hỏi xác nhận -->
+                        Xác nhận hoàn thành chuyến xe
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="card-body" >
+            <div class="data_table">
+                <table id="datatable" class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>HỌ TÊN</th>
+                        <th>SDT</th>
+                        <th>GHẾ</th>
+                        <th>TỔNG TIỀN</th>
+                        <th>TRẠNG THÁI THANH TOÁN</th>
+                        <th>HÌNH THỨC THANH TOÁN</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="payment : ${Payments}">
+                            <td >
+                                <b th:text="${payment.getFullName()}"></b>
+                            </td>
+                            <td >
+                                <b th:text="${payment.getPhoneNumber()}"></b>
+                            </td>
+                            <td>
+                                <b th:text="${payment.getSeatNumber()}"></b>
+                            </td>
+                            <td>
+                                <b th:text="${payment.getTotalPrice()}"></b>
+                            </td>
+                            <td>
+                                <b th:text="${payment.getPaymentStatus()}"></b>
+                            </td>
+                            <td>
+                                <b th:text="${payment.getPaymentMethod()}"></b>
+                            </td>
+                            <td>
+                                <button type="button" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal"
+                                        data-bs-whatever="@mdo"
+                                        th:attr="data-payment-id=${payment.getBookingId()}">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                                <form th:action="@{/admin/payment}" method="post" style="display: inline;"
+                                      th:if="${payment.paymentStatus.toLowerCase() == 'chờ'}"> <!-- Chỉ hiện khi PENDING -->
+                                    <input type="hidden" name="paymentId" th:value="${payment.getBookingId()}">
+                                    <input type="hidden" name="action" value="confirm">
+                                    <button type="submit" class="btn btn-success btn-sm"
+                                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận thanh toán này?');"> <!-- Hỏi xác nhận -->
+                                        <i class="fa-solid fa-check"></i> Xác nhận
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <!-- ** Sửa: Tiêu đề cập nhật bằng JS ** -->
+                                        <h5 class="modal-title" id="exampleModalLabel">Hủy Thanh toán</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- ** Sửa: Gán ID cho form ** -->
+                                        <form id="cancelPaymentForm" th:action="@{/admin/payment}" method="post">
+                                            <p>Nhập lý do hủy cho Payment ID: <strong id="modalPaymentIdDisplay"></strong></p> <!-- Thêm để hiển thị ID -->
+                                            <div class="mb-3">
+                                                <label for="message-text" class="col-form-label">Note:</label>
+                                                <textarea class="form-control" id="message-text" name="note" required></textarea> <!-- Thêm required nếu cần -->
+                                                <input type="hidden" name="action" value="cancel"> <!-- Action là cancel cho form này -->
+                                                <!-- ** Sửa: Input ẩn cho paymentId, xóa th:value, thêm id ** -->
+                                                <input type="hidden" id="modalPaymentIdInput" name="paymentId" value="">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                        <!-- ** Sửa: Nút submit liên kết với form bằng thuộc tính 'form' ** -->
+                                        <button type="submit" class="btn btn-danger" form="cancelPaymentForm">Xác nhận Hủy</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </tbody>
+                </table>
+
+                <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+                <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+                <script src="https://cdn.datatables.net/buttons/3.2.2/js/dataTables.buttons.js"></script>
+                <script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.dataTables.js"></script>
+
+                <script>
+                    $(document).ready(function() { // Đảm bảo DOM đã sẵn sàng (khuyến nghị)
+                        new DataTable('#datatable', {
+                            layout: {
+                                topStart: {
+                                    buttons: ['print']
+                                }
+                            }
+                        });
+                    });
+
+                    document.addEventListener('DOMContentLoaded', function() { // Chạy khi DOM sẵn sàng
+                        var cancelModal = document.getElementById('exampleModal'); // Lấy modal bằng ID
+
+                        if (cancelModal) { // Kiểm tra xem modal có tồn tại không
+                            cancelModal.addEventListener('show.bs.modal', function (event) {
+                                // Button đã kích hoạt modal
+                                var button = event.relatedTarget;
+
+                                // ** Sửa: Lấy paymentId từ data-payment-id **
+                                var paymentId = button.getAttribute('data-payment-id');
+
+                                // Tìm các element bên trong modal bằng ID
+                                var modalTitle = cancelModal.querySelector('.modal-title');
+                                var modalPaymentIdDisplay = cancelModal.querySelector('#modalPaymentIdDisplay');
+                                var modalPaymentIdInput = cancelModal.querySelector('#modalPaymentIdInput'); // ** Tìm đúng input ẩn **
+                                var modalNoteTextarea = cancelModal.querySelector('#message-text'); // Tìm textarea để reset
+
+                                // Cập nhật nội dung và giá trị trong modal
+                                modalTitle.textContent = 'Hủy Thanh toán ID: ' + paymentId; // Cập nhật tiêu đề
+                                if(modalPaymentIdDisplay) {
+                                    modalPaymentIdDisplay.textContent = paymentId; // Hiển thị ID
+                                }
+                                if (modalPaymentIdInput) {
+                                    modalPaymentIdInput.value = paymentId; // ** Quan trọng: Đặt giá trị paymentId cho input ẩn **
+                                }
+                                if (modalNoteTextarea) {
+                                    modalNoteTextarea.value = ''; // Xóa nội dung note cũ khi mở modal
+                                }
+                            });
+                        } else {
+                            console.error("Modal with ID 'exampleModal' not found.");
+                        }
+                    });
+                </script>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<th:block layout:fragment="script">
+    <!--            bootstrap 5.2.3 js-->
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</th:block>
+
+</body>
+</html>

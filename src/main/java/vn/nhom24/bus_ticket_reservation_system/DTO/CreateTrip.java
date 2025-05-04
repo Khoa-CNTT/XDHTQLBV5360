@@ -3,14 +3,17 @@ package vn.nhom24.bus_ticket_reservation_system.DTO;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 public class CreateTrip {
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "không được để trống.")
     private LocalDate startDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "không được để trống.")
     private LocalDate endDate;
 

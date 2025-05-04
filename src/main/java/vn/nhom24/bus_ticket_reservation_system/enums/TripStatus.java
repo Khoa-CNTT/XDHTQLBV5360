@@ -2,7 +2,9 @@ package vn.nhom24.bus_ticket_reservation_system.enums;
 
 public enum TripStatus {
     BOOKED("BOOKED","Chưa xuất phát"), // GIỮ CHỖ NHƯNG CHỦA TAHNH TOÁN
-    COMPLETE("COMPLETE", "Đã hoàn thành");// ghế đã có người mua và thanh toán
+    COMPLETE("COMPLETE", "Đã hoàn thành"),// ghế đã có người mua và thanh toán
+    RUNNING("RUNNING", "Đã khởi hành"),
+    CANCELLED("CANCELLED", "Hủy chuyến ");
 
     private final String status;
     private final String displayName;

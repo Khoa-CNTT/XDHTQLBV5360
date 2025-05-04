@@ -95,7 +95,7 @@ public class SeatController {
         model.addAttribute("departureLocation",departureLocation);
         model.addAttribute("arrivalLocation",arrivalLocation);
 
-        return "public/seat-booking";
+        return "public/choose-seat";
     }
 
 

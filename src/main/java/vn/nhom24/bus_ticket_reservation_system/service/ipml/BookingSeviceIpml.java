@@ -2,6 +2,7 @@ package vn.nhom24.bus_ticket_reservation_system.service.ipml;
 
 import com.google.zxing.WriterException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +14,7 @@ import vn.nhom24.bus_ticket_reservation_system.entity.Booking;
 import vn.nhom24.bus_ticket_reservation_system.entity.Ticket;
 import vn.nhom24.bus_ticket_reservation_system.enums.BookingStatus;
 import vn.nhom24.bus_ticket_reservation_system.enums.SeatStatus;
+import vn.nhom24.bus_ticket_reservation_system.enums.TripStatus;
 import vn.nhom24.bus_ticket_reservation_system.exception.AppException;
 import vn.nhom24.bus_ticket_reservation_system.exception.ErrorCode;
 import vn.nhom24.bus_ticket_reservation_system.repository.BookingReposity;
@@ -28,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class BookingSeviceIpml implements BookingSevice {
 
     @Autowired
@@ -78,9 +81,8 @@ public class BookingSeviceIpml implements BookingSevice {
     }
 
     @Override
-    public List<Booking> findPaidOrBookedByEmail(String email) {
-        List<BookingStatus> statuses = Arrays.asList(BookingStatus.PAID, BookingStatus.BOOKED);
-        return bookingReposity.findByEmailAndStatusIn(email, statuses);
+    public List<Booking> findPaidOrBookedByEmail(String email, List<BookingStatus> status , TripStatus trip) {
+        return bookingReposity.findByEmailAndStatusIn(email,status,trip );
     }
 
 
@@ -108,7 +110,6 @@ public class BookingSeviceIpml implements BookingSevice {
         }else if(bookingStatus == BookingStatus.PAID ){
             // tạo mã booking code
             booking.setBookingCode(UUID.randomUUID().toString());
-            bookingReposity.save(booking);
 
             booking.getTickets().forEach( ticket -> {
                 ticketSevice.updateStatusById(ticket.getId(), SeatStatus.SOLD);
@@ -220,5 +221,10 @@ public class BookingSeviceIpml implements BookingSevice {
         booking.setStatus(BookingStatus.CHECKED_IN);
         bookingReposity.save(booking);
         return this.findBookingById(booking.getId());
+    }
+
+    @Override
+    public List<Booking> findByTripId(int id) {
+        return bookingReposity.findByTripId(id);
     }
 }
