@@ -72,7 +72,7 @@
         <p class="text-center fs-3">Đánh giá chuyến xe</p>
         <div class="col-lg-12 mx-auto" th:each="booking : ${bookings}" >
             <div class="card shadow-sm border-1 rounded-lg my-4" style="background-color: #FAFAF5" th:if="${!booking.isRated}">
-                <div class="row g-0 m-2 " style="height: 170px">
+                <div class="row g-0 m-2 " style="height: 200px">
                     <div class="col-md-3 h-100  d-flex justify-content-center align-items-center">
                         <div  th:id="'qrcode-' + ${booking.id}"
                              th:attr="data-bookingcode=${booking.bookingCode}"> <!-- Đặt kích thước cho QR Code -->
