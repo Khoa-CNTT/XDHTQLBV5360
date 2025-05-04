@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{user/profile-static}">
+<head>
+    <title>Quản lý vé</title>
+</head>
+
+<body>
+<section class="container " layout:fragment="content">
+    <div class="" th:if="${bookings != null}">
+        <div th:if="${my_error}" class="alert alert-success col-6 w-100">
+            <span th:text="${my_error}"> </span>
+        </div>
+        <p class="text-center fs-3">Danh sách vé chưa đi</p>
+        <div class="col-lg-12 mx-auto" th:each="booking : ${bookings}" >
+            <div class="card shadow-sm border-1 rounded-lg my-4" style="background-color: #FAFAF5" >
+                <div class="row g-0 m-2 " style="height: 170px">
+                    <div class="col-md-3 h-100  d-flex justify-content-center align-items-center">
+                        <div  th:id="'qrcode-' + ${booking.id}"
+                              th:attr="data-bookingcode=${booking.bookingCode}"> <!-- Đặt kích thước cho QR Code -->
+                        </div>
+                    </div>
+
+                    <div class="h-100 col-md-5 ps-1">
+                        <p class="card-text m-0">Mã Chuyến xe : <strong th:text="${booking.getTrip().getId()}"> </strong></p>
+                        <p class="card-text m-0">Số điện thoại : <strong th:text="${booking.getPhoneNumber()}"> </strong></p>
+                        <p class="card-text m-0">Chuyến xe : <strong th:text="${booking.getTrip().getName()}"> </strong></p>
+                        <p class="card-text m-0">Thời gian : <strong th:text="${booking.getTrip().getStartDate()}"></strong></p>
+                        <p class="card-text m-0">Điểm đón : <strong th:text="${booking.getDeparture().stopName}">  </strong></p>
+                        <p class="card-text m-0">Điểm trả : <strong th:text="${booking.getArrival().stopName}"> </strong></p>
+                        <p class="card-text m-0">Số ghế :
+                            <strong>
+                                <span th:each="ticket : ${booking.getTickets()}">
+                                        <span th:text="${ticket.getSeatName() != null ? ticket.getSeatName() : '&nbsp;'}"></span>,
+                                    </span>
+                            </strong>
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 d-flex justify-content-between flex-column">
+                        <p class="fs-5 text-end fw-semibold"  th:text="${booking.getTrip().status.getDisplayName()}"></p>
+
+                        <div class="col-12 ">
+                            <p class="text-opacity-50 text-end my-2" th:with="quantity=${booking.getTickets().size()}">
+                                <span  th:with="pricePerSeat=${booking.getTrip().getPriceList().getPrice()}"> Thành tiền :
+                                    <span th:text="${#numbers.formatDecimal(quantity * pricePerSeat, 0, 'COMMA', 0, 'POINT') + ' VND'}"> </span>
+                                </span> </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrCodeContainers = document.querySelectorAll('[id^="qrcode-"]');
+
+            qrCodeContainers.forEach(function(container) {
+                // Lấy booking code từ data attribute
+                const bookingCode = container.dataset.bookingcode;
+                // Lấy id của div container
+                const containerId = container.id;
+
+                // Kiểm tra xem bookingCode có tồn tại không
+                if (bookingCode && containerId) {
+                    // Tạo QR Code mới
+                    new QRCode(document.getElementById(containerId), {
+                        text: bookingCode,        // Nội dung QR Code
+                        width: 150,               // Chiều rộng (nên bằng kích thước div)
+                        height: 150,              // Chiều cao (nên bằng kích thước div)
+                        colorDark : "#000000",    // Màu QR Code
+                        colorLight : "#ffffff",   // Màu nền
+                        correctLevel : QRCode.CorrectLevel.H // Mức độ sửa lỗi
+                    });
+                } else {
+                    // Xử lý trường hợp không có booking code (tùy chọn)
+                    console.warn("Không tìm thấy booking code cho element id:", containerId);
+                    container.innerHTML = "Lỗi QR"; // Hiển thị thông báo lỗi
+                }
+            });
+        });
+    </script>
+</section>
+</body>
+</html>
