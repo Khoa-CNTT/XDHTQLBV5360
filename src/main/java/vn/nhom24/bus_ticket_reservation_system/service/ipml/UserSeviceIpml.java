@@ -1,5 +1,6 @@
 package vn.nhom24.bus_ticket_reservation_system.service.ipml;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserSeviceIpml implements UserSevice {
 
     private UserRepository userRepository;
@@ -60,14 +62,14 @@ public class UserSeviceIpml implements UserSevice {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException, AccountNotVerifiedException {
-       User user = userRepository.findByEmail(email);
-       if(user==null){
-           throw new UsernameNotFoundException("invalid Username or password");
-       }
-       if(!user.isEnable()){
-           throw new AccountNotVerifiedException("account is not verified");
-       }
-       return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassWord(), rolesToAuthorities(user.getRoles()));
+        User user = userRepository.findByEmail(email);
+        if(user==null){
+            throw new UsernameNotFoundException("invalid Username or password");
+        }
+        if(!user.isEnable()){
+            throw new AccountNotVerifiedException("account is not verified");
+        }
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassWord(), rolesToAuthorities(user.getRoles()));
     }
 
     private Collection<? extends GrantedAuthority> rolesToAuthorities(Collection<Role> roles){
@@ -106,15 +108,23 @@ public class UserSeviceIpml implements UserSevice {
     }
 
     @Override
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
     public boolean verifyAccount(String email, String token) {
         User user = userRepository.findByEmail(email);
         //kiểm tra tài khoản đã tônf tại hay chưa
         if(user != null){
+
+            log.info("kiểm tra tài khoản đã tônf tại hay chưa");
             // kiểm tra otp khớp hay không . và xem hiệu lục token đã hết hạn hay chưa
             if (user.getActivationCode().equals(token)
                     && Duration.between(user.getOtpGeneratedTime(),
                     LocalDateTime.now()).getSeconds() < (24 * 60 * 60)
             ) {
+                log.info("kiểm tra otp khớp hay không . và xem hiệu lục token đã hết hạn hay chưa");
                 user.setEnable(true);
                 userRepository.save(user);
                 return true;
