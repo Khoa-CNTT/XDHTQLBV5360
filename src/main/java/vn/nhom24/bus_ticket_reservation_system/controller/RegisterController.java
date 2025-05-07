@@ -48,22 +48,19 @@ public class RegisterController {
         // kiểm tra xem số điện thoại đã tồn tại hay chưa
         User userExisting = userSeviceIpml.findByEmail(registerUser.getEmail());
 
-        if(userExisting!=null){
-            model.addAttribute("registerUser",new RegisterUser());
-            model.addAttribute("my_error","Email đã được đăng ký");
-
+        if(userExisting != null){
+            model.addAttribute("my_error", "Email đã được đăng ký");
             return "public/register";
         }
 
         // nếu số điện thoại chưa được đăng ký thì tạo tài khoản mới và kiểm tra đã đăng ký thành công hay chưa
-
-        if(!userSeviceIpml.save(registerUser)){
-            model.addAttribute("registerUser",new RegisterUser());
-            model.addAttribute("my_error","đăng ký tài khoản không thành công");
-            return "public/register";
+        if(userSeviceIpml.save(registerUser)){
+            model.addAttribute("notification", "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản");
+            return "public/confirm";
         }
 
-        return "public/confirm";
+        model.addAttribute("my_error", "đăng ký tài khoản không thành công");
+        return "public/register";
     }
 
 
