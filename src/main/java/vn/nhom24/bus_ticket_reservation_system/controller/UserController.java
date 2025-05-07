@@ -12,7 +12,7 @@ import vn.nhom24.bus_ticket_reservation_system.DTO.PasswordChangeDto;
 import vn.nhom24.bus_ticket_reservation_system.entity.Booking;
 import vn.nhom24.bus_ticket_reservation_system.entity.Route;
 import vn.nhom24.bus_ticket_reservation_system.entity.Tinhtp;
-import vn.nhom24.bus_ticket_reservation_system.entity.User;z
+import vn.nhom24.bus_ticket_reservation_system.entity.User;
 import vn.nhom24.bus_ticket_reservation_system.enums.BookingStatus;
 import vn.nhom24.bus_ticket_reservation_system.enums.TripStatus;
 import vn.nhom24.bus_ticket_reservation_system.service.*;
@@ -40,6 +40,15 @@ public class UserController {
     RatingSevice ratingSevice;
     RouteSevice routeSevice;
 
+
+    @GetMapping("/info")
+    public String userInfo(Model model, Principal principal) {
+        String username = principal.getName();
+        User user = userSevice.findByEmail(username);
+        model.addAttribute("user", user);
+        return "user/profile-static";
+    }
+
     @GetMapping("/tickets")
     public String manageTickets(Model model, Principal principal) {
         String username = principal.getName();
@@ -52,16 +61,6 @@ public class UserController {
         return "user/ticket-management";
     }
 
-
-    @GetMapping("/info")
-    public String userInfo(Model model, Principal principal) {
-        String username = principal.getName();
-        User user = userSevice.findByEmail(username);
-        model.addAttribute("user", user);
-        return "user/userinfo";
-    }
-
-
     @PostMapping("/rating")
     public String rating(Model model,
                          Principal principal,
@@ -72,7 +71,7 @@ public class UserController {
         String username = principal.getName();
         User user = userSevice.findByEmail(username);
 
-        String my_error = "đánh giá thành công";
+        String my_error = "Đánh giá thành công";
         if (ratingSevice.checkRating(bookingId)) {
             my_error = "Vé này đã được đánh giá đánh giá";
         }
