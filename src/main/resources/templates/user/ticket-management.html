@@ -1,87 +1,376 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{user/profile-static}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout">
+
 <head>
-    <title>Quản lý vé</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXURY BUS</title>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="76x76" href="../../favicon/logo72x72.png">
+    <link rel="icon" type="image/icon" sizes="32x32" href="../../favicon/logo32x32.png">
+    <link rel="icon" type="image/icon" sizes="16x16" href="../../favicon/logo16x16.png">
+    <link rel="manifest" href="../../favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" href="../../css/main.css">
+
+    <!-- Script -->
+    <script th:src="@{/js/scripts.js}"></script>
+
+    <style>
+        .profile-menu.active {
+            background-color: #e8f5e9;
+            border-left: 4px solid #28a745;
+        }
+
+        .profile-menu.active .profile-menu__title {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .user-menu__link.active {
+            background-color: #e8f5e9;
+            color: #28a745;
+        }
+    </style>
+
 </head>
 
 <body>
-<section class="container " layout:fragment="content">
-    <div class="" th:if="${bookings != null}">
-        <div th:if="${my_error}" class="alert alert-success col-6 w-100">
-            <span th:text="${my_error}"> </span>
-        </div>
-        <p class="text-center fs-3">Danh sách vé chưa đi</p>
-        <div class="col-lg-12 mx-auto" th:each="booking : ${bookings}" >
-            <div class="card shadow-sm border-1 rounded-lg my-4" style="background-color: #FAFAF5" >
-                <div class="row g-0 m-2 " style="height: 170px">
-                    <div class="col-md-3 h-100  d-flex justify-content-center align-items-center">
-                        <div  th:id="'qrcode-' + ${booking.id}"
-                              th:attr="data-bookingcode=${booking.bookingCode}"> <!-- Đặt kích thước cho QR Code -->
+    <!-- Header -->
+    <header id="header" class="header" style="height: 125px">
+        <div class="container">
+            <!-- Logo -->
+            <a id="home" th:href="@{/user/info}" class="logo top-bar-logo">
+                <img src="../../icon/logo-primary.svg" alt="LUXURY BUS" class="top-bar-logo__img">
+            </a>
+
+            <div class="top-bar">
+                <!-- More -->
+                <button class="top-bar__more d-none d-lg-block">
+                    <img src="../../icon/more.svg" alt="" class="icon top-bar__more-icon">
+                </button>
+
+                <!-- Actions -->
+                <div class="top-act d-lg-none">
+                    <div class="top-act__user">
+                        <div class="d-flex justify-center items-center">
+                            <img src="../../imgs/avatar.png" alt="" class="top-act__avatar">
+                            <div class="text-white pl-4" th:text="${user.getFullName()}"></div>
+                            <img src="../../icon/icon_form_droplist.svg" alt="" class="pl-4">
+                        </div>
+
+                        <!-- Dropdown -->
+                        <div class="act-dropdown top-act__dropdown">
+                            <div class="act-dropdown__inner user-menu">
+                                <img src="../../icon/arrow-up.png" alt=""
+                                    class="act-dropdown__arrow top-act__dropdown-arrow">
+
+                                <div class="user-menu__top">
+                                    <img src="../../imgs/avatar.png" alt="" class="user-menu__avatar">
+                                    <div>
+                                        <p class="user-menu__name" th:text="${user.getFullName()}"></p>
+                                    </div>
+                                </div>
+
+                                <ul class="user-menu__list">
+                                    <li>
+                                        <a th:href="@{/user/info}" class="user-menu__link">
+                                            <img src="../../icon/Profile.svg" alt="" class="user-menu__icon">
+                                            Thông tin tài khoản
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/user/tickets}" class="user-menu__link active">
+                                            <img src="../../icon/History.svg" alt="" class="user-menu__icon">
+                                            Lịch sử mua vé
+                                        </a>
+                                    </li>
+                                    <li class="user-menu__separate">
+                                        <a th:href="@{/user/reviews}" class="user-menu__link">
+                                            <img src="../../icon/Address.svg" alt="" class="user-menu__icon">
+                                            Đánh giá vé
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/user/change-password}" class="user-menu__link">
+                                            <img src="../../icon/Password.svg" alt="" class="user-menu__icon">
+                                            Đặt lại mật khẩu
+                                        </a>
+                                    </li>
+                                    <li class="user-menu__separate">
+                                        <a href="#!" class="user-menu__link" th:href="@{/logout}">
+                                            <img src="../../icon/Logout.svg" alt="" class="user-menu__icon">
+                                            Đăng xuất
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="h-100 col-md-5 ps-1">
-                        <p class="card-text m-0">Mã Chuyến xe : <strong th:text="${booking.getTrip().getId()}"> </strong></p>
-                        <p class="card-text m-0">Số điện thoại : <strong th:text="${booking.getPhoneNumber()}"> </strong></p>
-                        <p class="card-text m-0">Chuyến xe : <strong th:text="${booking.getTrip().getName()}"> </strong></p>
-                        <p class="card-text m-0">Thời gian : <strong th:text="${booking.getTrip().getStartDate()}"></strong></p>
-                        <p class="card-text m-0">Điểm đón : <strong th:text="${booking.getDeparture().stopName}">  </strong></p>
-                        <p class="card-text m-0">Điểm trả : <strong th:text="${booking.getArrival().stopName}"> </strong></p>
-                        <p class="card-text m-0">Số ghế :
-                            <strong>
-                                <span th:each="ticket : ${booking.getTickets()}">
-                                        <span th:text="${ticket.getSeatName() != null ? ticket.getSeatName() : '&nbsp;'}"></span>,
-                                    </span>
-                            </strong>
-                        </p>
+                <!-- More -->
+                <button class="top-bar__more d-none d-lg-block">
+                    <img src="../../icon/person.svg" alt="" class="icon top-bar__more-icon">
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="profile">
+        <div class="container">
+            <!-- Profile content -->
+            <div class="profile-container">
+                <div class="row gy-md-3">
+                    <div class="col-3 col-xl-4 d-lg-none">
+                        <aside class="profile__sidebar">
+                            <!-- Menu 1 -->
+                            <a th:href="@{/user/info}" class="profile-menu">
+                                <img src="../../icon/Profile.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Thông tin tài khoản</span>
+                            </a>
+
+                            <!-- Menu 2 -->
+                            <a th:href="@{/user/tickets}" class="profile-menu active">
+                                <img src="../../icon/History.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Lịch sử mua vé</span>
+                            </a>
+
+                            <!-- Menu 3 -->
+                            <a th:href="@{/user/reviews}" class="profile-menu">
+                                <img src="../../icon/Address.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Đánh giá vé</span>
+                            </a>
+
+                            <!-- Menu 4 -->
+                            <a th:href="@{/user/change-password}" class="profile-menu">
+                                <img src="../../icon/Password.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Đặt lại mật khẩu</span>
+                            </a>
+                            <!-- Menu 5 -->
+                            <a th:href="@{/logout}" class="profile-menu">
+                                <img src="../../icon/Logout.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Đăng xuất</span>
+                            </a>
+                        </aside>
                     </div>
+                    <div class="col-9 col-xl-8 col-lg-12">
+                        <div class="profile-sidebar">
+                            <div class="row gy-3">
+                                <div class="col-12">
+                                    <!-- Title -->
+                                    <div class="profile-sidebar__top">
+                                        <div class="profile-sidebar__top-left">
+                                            <h2 class="profile-sidebar__heading">
+                                                <a th:href="@{/user/info}">
+                                                    <img src="../../icon/arrow-left.svg" alt=""
+                                                        class="icon profile-sidebar__icon">
+                                                </a>
+                                                Lịch sử mua vé
+                                            </h2>
+                                            <p class="profile-sidebar__desc">Theo dõi và quản lý quá trình lịch sử mua
+                                                vé của bạn</p>
+                                        </div>
+                                    </div>
 
-                    <div class="col-md-4 d-flex justify-content-between flex-column">
-                        <p class="fs-5 text-end fw-semibold"  th:text="${booking.getTrip().status.getDisplayName()}"></p>
+                                    <!-- Table -->
+                                    <div class="table-antd">
+                                        <div class="table-container">
+                                            <div class="ant-table">
+                                                <div class="ant-table__container"
+                                                    style="overflow-x: scroll; max-height: 400px;">
+                                                    <div class="ant-table__header">
+                                                        <table class="ant-table__table" style="table-layout: fixed;">
+                                                            <colgroup>
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 180px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 120px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 150px;" />
+                                                            </colgroup>
+                                                            <thead class="ant-table-thead">
+                                                                <tr>
+                                                                    <th class="ant-table-cell text-center">Mã QR vé</th>
+                                                                    <th class="ant-table-cell text-center">Chuyến xe
+                                                                    </th>
+                                                                    <th class="ant-table-cell text-center">Thời gian
+                                                                    </th>
+                                                                    <th class="ant-table-cell text-center">Điểm đón</th>
+                                                                    <th class="ant-table-cell text-center">Điểm trả</th>
+                                                                    <th class="ant-table-cell text-center">Số ghế</th>
+                                                                    <th class="ant-table-cell text-center">Số điện thoại
+                                                                    </th>
+                                                                    <th class="ant-table-cell text-center">Trạng thái
+                                                                    </th>
+                                                                    <th class="ant-table-cell text-center">Thành tiền
+                                                                    </th>
+                                                                    <th class="ant-table-cell ant-table-cell-scrollbar">
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
 
-                        <div class="col-12 ">
-                            <p class="text-opacity-50 text-end my-2" th:with="quantity=${booking.getTickets().size()}">
-                                <span  th:with="pricePerSeat=${booking.getTrip().getPriceList().getPrice()}"> Thành tiền :
-                                    <span th:text="${#numbers.formatDecimal(quantity * pricePerSeat, 0, 'COMMA', 0, 'POINT') + ' VND'}"> </span>
-                                </span> </p>
+                                                    <!-- Empty state when no bookings -->
+                                                    <div th:if="${bookings == null || bookings.isEmpty()}"
+                                                        class="empty-state-container"
+                                                        style="padding: 40px 0; text-align: center;">
+                                                        <img src="../../icon/empty-ticket.svg" alt="No tickets"
+                                                            style="width: 120px; height: 120px; margin-bottom: 20px;"
+                                                            onerror="this.src='../../icon/History.svg'; this.style.opacity='0.3';">
+                                                        <h4 style="color: #333; margin-bottom: 10px;">Bạn chưa có vé nào
+                                                        </h4>
+                                                        <p style="color: #666; margin-bottom: 20px;">Hãy đặt vé để bắt
+                                                            đầu hành trình của bạn</p>
+                                                        <a th:href="@{/}" class="btn btn--primary btn--rounded"
+                                                            style="padding: 10px 20px;">
+                                                            Đặt vé ngay
+                                                        </a>
+                                                    </div>
+
+                                                    <div class="ant-table__body"
+                                                        th:if="${bookings != null && !bookings.isEmpty()}">
+                                                        <div th:if="${my_error}"
+                                                            class="alert alert-success col-6 w-100">
+                                                            <span th:text="${my_error}"> </span>
+                                                        </div>
+                                                        <table class="ant-table__table" style="table-layout: fixed;">
+                                                            <colgroup>
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 180px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 120px;" />
+                                                                <col style="width: 100px;" />
+                                                                <col style="width: 150px;" />
+                                                            </colgroup>
+                                                            <tbody class="ant-table-tbody">
+                                                                <!-- History 1 -->
+                                                                <tr class="ant-table-measure-row"
+                                                                    th:each="booking : ${bookings}">
+                                                                    <td class="text-center ant-table-cell">
+                                                                        <img id="qrcode" class="qrcode"
+                                                                            th:data-booking-id="${booking.getId()}"
+                                                                            alt="QR CODE">
+                                                                    </td>
+                                                                    <td class="text-center border">
+                                                                        <p class="font-medium"
+                                                                            th:text="${booking.getTrip().getName()}">
+                                                                        </p>
+                                                                    </td>
+                                                                    <td class="text-center border">
+                                                                        <p class="font-medium"
+                                                                            th:text="${booking.getTrip().getStartDate()}">
+                                                                        </p>
+                                                                    </td>
+                                                                    <td class="text-center border">
+                                                                        <p class="font-medium"
+                                                                            th:text="${booking.getDeparture().stopName}">
+                                                                        </p>
+                                                                    </td>
+                                                                    <td class="text-center border">
+                                                                        <p class="font-medium"
+                                                                            th:text="${booking.getArrival().stopName}">
+                                                                        </p>
+                                                                    </td>
+                                                                    <td class="text-center border">
+                                                                        <p class="font-medium"
+                                                                            th:each="ticket : ${booking.getTickets()}">
+                                                                            <span
+                                                                                th:text="${ticket.getSeatName() != null ? ticket.getSeatName() : '&nbsp;'}"></span>
+                                                                        </p>
+                                                                    </td>
+                                                                    <td class="text-center border">
+                                                                        <p class="font-medium"
+                                                                            th:text="${booking.getPhoneNumber()}"></p>
+                                                                    </td>
+                                                                    <td class="text-center border">
+                                                                        <p class="font-medium"
+                                                                            th:text="${booking.getTrip().status.getDisplayName()}">
+                                                                        </p>
+                                                                    </td>
+                                                                    <td class="text-center border"
+                                                                        th:with="quantity=${booking.getTickets().size()}">
+                                                                        <p class="font-medium"
+                                                                            th:with="pricePerSeat=${booking.getTrip().getPriceList().getPrice()}">
+                                                                            <span
+                                                                                th:text="${#numbers.formatDecimal(quantity * pricePerSeat, 0, 'COMMA', 0, 'POINT') + ' VND'}"></span>
+                                                                        </p>
+                                                                    </td>
+                                                                <tr class="ant-table-placeholder">
+                                                                    <td colspan="8" class="ant-table-cell">
+
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{public/footer}"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const qrCodeContainers = document.querySelectorAll('[id^="qrcode-"]');
+        document.addEventListener('DOMContentLoaded', function () {
+            const qrCodeElements = document.querySelectorAll('.qrcode');
 
-            qrCodeContainers.forEach(function(container) {
-                // Lấy booking code từ data attribute
-                const bookingCode = container.dataset.bookingcode;
-                // Lấy id của div container
-                const containerId = container.id;
+            qrCodeElements.forEach(function (imgElement) {
+                const bookingId = imgElement.getAttribute('data-booking-id');
 
-                // Kiểm tra xem bookingCode có tồn tại không
-                if (bookingCode && containerId) {
-                    // Tạo QR Code mới
-                    new QRCode(document.getElementById(containerId), {
-                        text: bookingCode,        // Nội dung QR Code
-                        width: 150,               // Chiều rộng (nên bằng kích thước div)
-                        height: 150,              // Chiều cao (nên bằng kích thước div)
-                        colorDark : "#000000",    // Màu QR Code
-                        colorLight : "#ffffff",   // Màu nền
-                        correctLevel : QRCode.CorrectLevel.H // Mức độ sửa lỗi
-                    });
-                } else {
-                    // Xử lý trường hợp không có booking code (tùy chọn)
-                    console.warn("Không tìm thấy booking code cho element id:", containerId);
-                    container.innerHTML = "Lỗi QR"; // Hiển thị thông báo lỗi
-                }
+                imgElement.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + bookingId;
+            });
+
+
+
+
+            var modal = document.getElementById('ratingModal');
+
+            modal.addEventListener('shown.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var bookingIdText = button.getAttribute('data-booking-id');
+                var tripNameText = button.getAttribute('data-trip-name');
+                var timeText = button.getAttribute('data-trip-time');
+
+                var tripName = document.getElementById('tripName');
+                var bookingId = document.getElementById('bookingId');
+                var time = document.getElementById('time');
+
+
+                tripName.innerText = "Chuyến xe : " + tripNameText;
+                time.innerText = "Thời gian : " + timeText;
+                bookingId.value = bookingIdText;
             });
         });
+
     </script>
-</section>
 </body>
+
 </html>

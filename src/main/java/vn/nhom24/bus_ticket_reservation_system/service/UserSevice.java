@@ -14,6 +14,8 @@ public interface UserSevice extends UserDetailsService {
     // đăng ký tài khoản
     public boolean save(RegisterUser registerUser);
 
+    public void save(User user);
+
     // xác thực tài khoản
     public boolean verifyAccount(String phoneNumber, String otp);
 
