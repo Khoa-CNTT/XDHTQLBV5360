@@ -111,7 +111,7 @@
                                 <b th:text="${trip.getEmptySeats()}"></b>
                             </td>
                             <td>
-                                <th:block th:if="${trip.getTripStatus() eq 'RUNNING' or trip.getTripStatus() eq 'COMPLETE' or trip.getTripStatus() eq 'BOOKED'}">
+                                <th:block th:if="${trip.getTripStatus() eq 'RUNNING'  or trip.getTripStatus() eq 'BOOKED'}">
                                     <a title="Quản lý chuyến xe" th:href="@{/admin/tripdetail(tripId=${trip.getTripId()})}" class="link-dark"><i class="fa-solid fa-gear fs-5 me-3" ></i></a>
                                 </th:block>
                                 <a title="Xem chi tiết chuyến xe" th:href="@{/admin/trip/{tripId}/detail(tripId=${trip.getTripId()})}" class="link-dark"><i class="fa-solid fa-table-list fs-5 me-3"></i></a>

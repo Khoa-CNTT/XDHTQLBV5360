@@ -104,6 +104,7 @@ public class BookingSeviceIpml implements BookingSevice {
     @Override
     public void updateStatus(Booking booking, BookingStatus bookingStatus) {
         if(bookingStatus == BookingStatus.BOOKED || bookingStatus == BookingStatus.PENDING){
+            booking.setBookingCode(UUID.randomUUID().toString());
             booking.getTickets().forEach( ticket -> {
                 ticketSevice.updateStatusById(ticket.getId(), SeatStatus.BOOKED);
             });
