@@ -13,8 +13,7 @@
                 </button>
 
                 <!-- Actions -->
-                <div class="top-act d-lg-none">
-
+                <div class="top-act d-lg-none" th:unless="${currentUser != null}">
                     <a th:href="@{/login}" class="top-act__sign-up">
                         <img src="../../icon/person.svg" alt="">
                         <span class="top-act__title">Đăng nhập/Đăng ký</span>
@@ -22,9 +21,63 @@
                 </div>
 
                 <!-- More -->
-                <a th:href="@{/user/info}" class="top-bar__more d-none d-lg-block">
-                    <img src="../../icon/person.svg" alt="" class="icon top-bar__more-icon">
-                </a>
+                <div class="top-act d-lg-none" th:if="${currentUser != null}">
+                    <div class="top-act__user">
+                        <div class="d-flex justify-center items-center">
+                            <img src="../../imgs/avatar.png" alt="" class="top-act__avatar">
+                            <div class="text-white pl-4" th:text="${currentUser.getFullName()}"></div>
+                            <img src="../../icon/icon_form_droplist.svg" alt="" class="pl-4">
+                        </div>
+
+                        <!-- Dropdown -->
+                        <div class="act-dropdown top-act__dropdown">
+                            <div class="act-dropdown__inner user-menu">
+                                <img src="../../icon/arrow-up.png" alt=""
+                                     class="act-dropdown__arrow top-act__dropdown-arrow">
+
+                                <div class="user-menu__top">
+                                    <img src="../../imgs/avatar.png" alt="" class="user-menu__avatar">
+                                    <div>
+                                        <p class="user-menu__name" th:text="${currentUser.getFullName()}"></p>
+                                    </div>
+                                </div>
+
+                                <ul class="user-menu__list">
+                                    <li>
+                                        <a th:href="@{/user/info}" class="user-menu__link active">
+                                            <img src="../../icon/Profile.svg" alt="" class="user-menu__icon">
+                                            Thông tin tài khoản
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/user/tickets}" class="user-menu__link">
+                                            <img src="../../icon/History.svg" alt="" class="user-menu__icon">
+                                            Lịch sử mua vé
+                                        </a>
+                                    </li>
+                                    <li class="user-menu__separate">
+                                        <a th:href="@{/user/reviews}" class="user-menu__link">
+                                            <img src="../../icon/Address.svg" alt="" class="user-menu__icon">
+                                            Đánh giá vé
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/user/change-password}" class="user-menu__link">
+                                            <img src="../../icon/Password.svg" alt="" class="user-menu__icon">
+                                            Đặt lại mật khẩu
+                                        </a>
+                                    </li>
+                                    <li class="user-menu__separate">
+                                        <a href="#!" class="user-menu__link" th:href="@{/logout}">
+                                            <img src="../../icon/Logout.svg" alt="" class="user-menu__icon">
+                                            Đăng xuất
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="bottom-bar">

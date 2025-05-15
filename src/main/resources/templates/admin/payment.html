@@ -33,7 +33,7 @@
                       th:if="${trip.getTripStatus().getStatus() eq 'BOOKED'}"> <!-- Chỉ hiện khi PENDING -->
                     <input type="hidden" name="action" value="start">
                     <button type="submit" class="btn btn-success me-3"
-                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận thanh toán này?');"> <!-- Hỏi xác nhận -->
+                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận khởi hành?');"> <!-- Hỏi xác nhận -->
                         Xác nhận khởi hành
                     </button>
                 </form>
@@ -41,9 +41,61 @@
                       th:if="${trip.getTripStatus().getStatus() eq 'RUNNING'}"> <!-- Chỉ hiện khi PENDING -->
                     <input type="hidden" name="action" value="complete">
                     <button type="submit" class="btn btn-success me-3"
-                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận thanh toán này?');"> <!-- Hỏi xác nhận -->
+                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận hoàn thành?');"> <!-- Hỏi xác nhận -->
                         Xác nhận hoàn thành chuyến xe
                     </button>
+                </form>
+            </div>
+        </div>
+        <div class="card mt-3 container">
+            <div class="card-header">
+                <b>THÔNG TIN CHUYẾN XE</b>
+            </div>
+            <div class="card-body">
+                <form class="row g-3" method="post">
+
+                    <!-- Xe -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Xe</label>
+                        <input type="text" class="form-control"
+                               th:value="${trip.car.id + ' - (' + trip.car.name + ')'}" disabled>
+                    </div>
+
+                    <!-- Tên chuyến đi -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Tên chuyến đi</label>
+                        <input type="text" class="form-control"
+                               th:value="${trip.name}" disabled>
+                    </div>
+
+                    <!-- Lịch trình -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Lịch trình</label>
+                        <input type="text" class="form-control"
+                               th:value="${trip.schedule.scheduleName}" disabled>
+                    </div>
+
+                    <!-- Ngày khởi hành -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ngày khởi hành</label>
+                        <input type="date" class="form-control"
+                               th:value="${trip.getStartDate()}" disabled>
+                    </div>
+
+                    <!-- Ngày đến nơi -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ngày đến nơi</label>
+                        <input type="date" class="form-control"
+                               th:value="${trip.getEndDate()}" disabled>
+                    </div>
+
+                    <!-- Giá -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Giá</label>
+                        <input type="text" class="form-control"
+                               th:value="${#numbers.formatCurrency(trip.getPriceList().getPrice())} +' - ' +${trip.getPriceList().getName()}" disabled>
+                    </div>
+
                 </form>
             </div>
         </div>
@@ -93,7 +145,7 @@
                                     <input type="hidden" name="paymentId" th:value="${payment.getBookingId()}">
                                     <input type="hidden" name="action" value="confirm">
                                     <button type="submit" class="btn btn-success btn-sm"
-                                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận thanh toán này?');"> <!-- Hỏi xác nhận -->
+                                            onclick="return confirm('Bạn chắc chắn muốn Xác nhận đã thanh toán cho vé này không?');"> <!-- Hỏi xác nhận -->
                                         <i class="fa-solid fa-check"></i> Xác nhận
                                     </button>
                                 </form>
@@ -188,10 +240,7 @@
 
 
 </div>
-<th:block layout:fragment="script">
-    <!--            bootstrap 5.2.3 js-->
-    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-</th:block>
+
 
 </body>
 </html>

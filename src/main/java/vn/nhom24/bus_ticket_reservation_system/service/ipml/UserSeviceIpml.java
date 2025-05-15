@@ -2,11 +2,17 @@ package vn.nhom24.bus_ticket_reservation_system.service.ipml;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import vn.nhom24.bus_ticket_reservation_system.DTO.AdminRegisterUser;
+import vn.nhom24.bus_ticket_reservation_system.DTO.AdminUpdateUserDto;
 import vn.nhom24.bus_ticket_reservation_system.DTO.RegisterUser;
 import vn.nhom24.bus_ticket_reservation_system.entity.Role;
 import vn.nhom24.bus_ticket_reservation_system.entity.User;
@@ -20,10 +26,7 @@ import vn.nhom24.bus_ticket_reservation_system.util.RandomCode;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,7 +80,24 @@ public class UserSeviceIpml implements UserSevice {
     }
     // ----------------------END
 
+    @Override
+    public boolean save(AdminRegisterUser registerUser) {
+        User user = new User();
+        user .setFullName(registerUser.getFullName());
+        user.setEmail(registerUser.getEmail());
+        user.setPassWord(registerUser.getPassWord());
+        user.setPhoneNumber(registerUser.getPhoneNumber());
+        user.setEnable(registerUser.isActive());
 
+        Role role = roleRepository.findByName(registerUser.getRole());
+        user.setRoles(List.of(role) );
+        if(userRepository.save(user) != null){
+            return true;
+        }
+
+        return false;
+
+    }
 
     @Override
     public boolean save(RegisterUser registerUser) {
@@ -88,6 +108,7 @@ public class UserSeviceIpml implements UserSevice {
         user.setPhoneNumber(registerUser.getPhoneNumber());
         user.setOtpGeneratedTime(LocalDateTime.now());
         user.setActivationCode(RandomCode.getSoNgauNhien());
+
 
         // xét dèault role USER cho ngưiof dùng
         Role role = roleRepository.findByName("ROLE_USER");
@@ -112,6 +133,7 @@ public class UserSeviceIpml implements UserSevice {
         userRepository.save(user);
     }
 
+
     @Override
     public boolean verifyAccount(String email, String token) {
         User user = userRepository.findByEmail(email);
@@ -134,6 +156,31 @@ public class UserSeviceIpml implements UserSevice {
 
     }
 
+    @Override
+    public User findById(int id) {
+       User user = userRepository.findById(id).orElse(null);
+        if(user == null){
+            throw new UsernameNotFoundException("user not found");
+        }
+        return user;
+    }
+
+    @Override
+    public void updateFromDto(AdminUpdateUserDto registerUser) {
+        User user = userRepository.findById(registerUser.getId()).orElse(null);
+        if(user == null){
+            throw new UsernameNotFoundException("user not found");
+        }
+        user.setFullName(registerUser.getFullName());
+        user.setEmail(registerUser.getEmail());
+        user.setPhoneNumber(registerUser.getPhoneNumber());
+        log.info("ROle :"+registerUser.getRole());
+        Role role = roleRepository.findByName(registerUser.getRole());
+
+        user.setRoles(new ArrayList<>(List.of(role)));
+        userRepository.save(user);
+    }
+
     public void regenerateOtp(String email) {
         User user = userRepository.findByEmail(email);
 
@@ -149,4 +196,29 @@ public class UserSeviceIpml implements UserSevice {
     }
 
 
+
+    @Override
+    public Page<User> getAll(int pageNo) {
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+
+        List<User> list = userRepository.findAll();
+
+        int total = list.size();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), total);
+
+        List<User> subList = list.subList(start, end);
+        return new PageImpl<>(subList, pageable, total);
+    }
+    public void updateUserActiveStatus(int userId,boolean active){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy người dùng với ID: " + userId));
+
+        // Cập nhật trạng thái isActive
+        user.setEnable(active);
+
+        // Lưu thay đổi vào cơ sở dữ liệu
+        userRepository.save(user);
+    }
 }

@@ -45,7 +45,7 @@ public class RegisterController {
             return "public/register";
         }
 
-        // kiểm tra xem số điện thoại đã tồn tại hay chưa
+        // kiểm tra xem số email đã tồn tại hay chưa
         User userExisting = userSeviceIpml.findByEmail(registerUser.getEmail());
 
         if(userExisting != null){

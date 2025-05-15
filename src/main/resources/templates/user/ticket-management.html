@@ -267,7 +267,7 @@
                                                                     th:each="booking : ${bookings}">
                                                                     <td class="text-center ant-table-cell">
                                                                         <img id="qrcode" class="qrcode"
-                                                                            th:data-booking-id="${booking.getId()}"
+                                                                            th:data-booking-id="${booking.getBookingCode()}"
                                                                             alt="QR CODE">
                                                                     </td>
                                                                     <td class="text-center border">
@@ -310,8 +310,8 @@
                                                                         th:with="quantity=${booking.getTickets().size()}">
                                                                         <p class="font-medium"
                                                                             th:with="pricePerSeat=${booking.getTrip().getPriceList().getPrice()}">
-                                                                            <span
-                                                                                th:text="${#numbers.formatDecimal(quantity * pricePerSeat, 0, 'COMMA', 0, 'POINT') + ' VND'}"></span>
+                                                                            <span th:text="${#numbers.formatDecimal((quantity * pricePerSeat).longValue(), 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+
                                                                         </p>
                                                                     </td>
                                                                 <tr class="ant-table-placeholder">

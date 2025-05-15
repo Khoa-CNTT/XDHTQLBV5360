@@ -10,14 +10,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import vn.nhom24.bus_ticket_reservation_system.DTO.TripCard;
 import vn.nhom24.bus_ticket_reservation_system.entity.Stop;
 import vn.nhom24.bus_ticket_reservation_system.entity.Tinhtp;
+import vn.nhom24.bus_ticket_reservation_system.entity.User;
 import vn.nhom24.bus_ticket_reservation_system.service.StopSevice;
 import vn.nhom24.bus_ticket_reservation_system.service.TripSevice;
+import vn.nhom24.bus_ticket_reservation_system.service.UserSevice;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
 @Controller
 public class TripController {
+    @Autowired
+    UserSevice userService;
 
     @Autowired
     TripSevice tripSevice;
@@ -40,8 +45,12 @@ public class TripController {
                                    @RequestParam(value = "destination",required = true) int destination,
                                    @RequestParam(value = "departureDate",required = true)
                                    @DateTimeFormat(pattern = "MM/dd/yyyy") LocalDate  departureDate,
-                                   Model model){
-
+                                   Model model, Principal principal){
+        if (principal != null) {
+            // Giả sử bạn có service lấy thông tin user từ principal
+            User user = userService.findByEmail(principal.getName());
+            model.addAttribute("currentUser", user);
+        }
 
         String myError = "";
 

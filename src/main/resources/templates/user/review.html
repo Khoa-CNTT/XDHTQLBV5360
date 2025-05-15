@@ -678,8 +678,7 @@
                                                                 <div class="price-tag mb-3"
                                                                     th:with="quantity=${booking.getTickets().size()}, pricePerSeat=${booking.getTrip().getPriceList().getPrice()}">
                                                                     Thành tiền:
-                                                                    <span
-                                                                        th:text="${#numbers.formatCurrency(quantity * pricePerSeat)}"></span>
+                                                                    <span th:text="${#numbers.formatDecimal((quantity * pricePerSeat).longValue(), 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
                                                                 </div>
                                                             </div>
                                                         </div>
