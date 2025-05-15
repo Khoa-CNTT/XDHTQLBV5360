@@ -24,5 +24,5 @@ public class RevenueRequest {
       String selectedRoute;
       Integer specificMonth;
       Integer specificYear;
-
+      Integer specificQuarter;
 }

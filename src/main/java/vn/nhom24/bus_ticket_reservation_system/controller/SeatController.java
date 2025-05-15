@@ -8,15 +8,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import vn.nhom24.bus_ticket_reservation_system.DTO.TripCard;
 import vn.nhom24.bus_ticket_reservation_system.entity.Ticket;
 import vn.nhom24.bus_ticket_reservation_system.entity.Trip;
+import vn.nhom24.bus_ticket_reservation_system.entity.User;
 import vn.nhom24.bus_ticket_reservation_system.service.TicketSevice;
 import vn.nhom24.bus_ticket_reservation_system.service.TripSevice;
+import vn.nhom24.bus_ticket_reservation_system.service.UserSevice;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class SeatController {
-
+    @Autowired
+    UserSevice userService;
     @Autowired
     TicketSevice ticketSevice;
 
@@ -28,8 +32,16 @@ public class SeatController {
             @RequestParam ("tripId") int tripId,
             @RequestParam("departureLocation") int departureLocation , // Điểm đón
             @RequestParam("arrivalLocation") int arrivalLocation , // điểm trả
-            Model model
+            Model model,
+            Principal principal
             ){
+
+        if (principal != null) {
+            // Giả sử bạn có service lấy thông tin user từ principal
+            User user = userService.findByEmail(principal.getName());
+            model.addAttribute("currentUser", user);
+        }
+
         Trip trip = tripSevice.findById(tripId);
 
 

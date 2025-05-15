@@ -4,7 +4,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RegisterUser {
     @NotBlank(message = "thông tin bắt buộc")
     @Size(min=1,message = " độ dài tối thiểu là 1")
@@ -23,46 +29,4 @@ public class RegisterUser {
     @Email(message = "Email không hợp lệ")
     private String email;
 
-
-    public RegisterUser() {
-    }
-
-    public RegisterUser(String fullName, String passWord, String phoneNumber, String email) {
-        this.fullName = fullName;
-        this.passWord = passWord;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

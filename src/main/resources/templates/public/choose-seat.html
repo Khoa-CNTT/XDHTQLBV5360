@@ -342,7 +342,12 @@
                                                 <div class="ant-form-item-control-input">
                                                     <div class="ant-form-item-control-input-content">
                                                             <span class="ant-input-affix-wrapper input-form mobile-input">
-                                                                <input type="text" class="ant-input" name="fullname" id="fullname" required>
+                                                                <input type="text"
+                                                                       class="ant-input"
+                                                                       name="fullname"
+                                                                       id="fullname"
+                                                                       required
+                                                                       th:value="${currentUser != null and currentUser.getFullName() != null ? currentUser.getFullName() : ''}">
                                                             </span>
                                                     </div>
                                                 </div>
@@ -363,7 +368,11 @@
                                                 <div class="ant-form-item-control-input">
                                                     <div class="ant-form-item-control-input-content">
                                                             <span class="ant-input-affix-wrapper input-form mobile-input mt-1">
-                                                                <input type="tel" class="ant-input" name="phonenumber" id="phonenumber" required>
+                                                                <input type="tel"
+                                                                       class="ant-input"
+                                                                       name="phonenumber"
+                                                                       id="phonenumber" required
+                                                                       th:value="${currentUser != null and currentUser.getPhoneNumber() != null ? currentUser.getPhoneNumber() : ''}">
                                                             </span>
                                                     </div>
                                                 </div>
@@ -384,7 +393,12 @@
                                                 <div class="ant-form-item-control-input">
                                                     <div class="ant-form-item-control-input-content">
                                                             <span class="ant-input-affix-wrapper input-form mobile-input mt-1">
-                                                                <input type="email" class="ant-input" name="email" id="email" required>
+                                                                <input type="email"
+                                                                       class="ant-input"
+                                                                       name="email"
+                                                                       id="email"
+                                                                       required
+                                                                       th:value="${currentUser != null and currentUser.getEmail() != null ? currentUser.getEmail() : ''}">
                                                             </span>
                                                     </div>
                                                 </div>

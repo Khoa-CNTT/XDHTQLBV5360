@@ -2,11 +2,13 @@ package vn.nhom24.bus_ticket_reservation_system.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.nhom24.bus_ticket_reservation_system.entity.Route;
 import vn.nhom24.bus_ticket_reservation_system.entity.Schedule;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ScheduleRopository extends JpaRepository<Schedule,Integer> {
@@ -27,4 +29,12 @@ public interface ScheduleRopository extends JpaRepository<Schedule,Integer> {
             "AND sd2.stop_number > sd1.stop_number " , nativeQuery = true)
     // 1 trong stop phải thuộc tỉnh đà nẵng . 2 điểm có trong cùng 1 lịch trình . và thứ tụ điểm dùưng của to > from
     public List<Schedule> findMatchingSchedules( int fromStopId,  int toStopId);
+
+    @Query("SELECT s FROM Schedule s " +
+            "LEFT JOIN FETCH s.route r " +
+            "LEFT JOIN FETCH s.scheduleDetails sd " +
+            "LEFT JOIN FETCH sd.stop st " +
+            "WHERE s.id = :scheduleId " + // Lọc theo ID
+            "ORDER BY sd.stopNumber") // Sắp xếp các điểm dừng
+    Optional<Schedule> findByIdWithDetailsAndStops(@Param("scheduleId") int scheduleId);
 }
