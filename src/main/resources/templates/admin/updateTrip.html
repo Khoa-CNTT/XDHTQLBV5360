@@ -11,8 +11,14 @@
   <title>Tables - SB Admin</title>
 </head>
 <body>
-<div layout:fragment="content" >
-  <div class="card mt-3 container">
+<div layout:fragment="content" class="container-fluid ">
+  <h1 class="mt-4">Quản lý chuyến xe</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/trip">Quản lý chuyến xe</a></li>
+    <li class="breadcrumb-item active">Chỉnh sửa chuyến xe</li>
+  </ol>
+  <div class="card mt-3">
     <div class="card-header">
       <b>CHỈNH SỬA CHUYẾN XE</b>
     </div>
@@ -83,7 +89,7 @@
         </div>
         <div class="col-12">
           <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-          <a th:href="@{/admin/trip/delete/{tripId}(tripId=${trip.getId()})}" class="btn btn-primary">hủy chuyến</a>
+          <a th:href="@{/admin/trip/delete/{tripId}(tripId=${trip.getId()})}" class="btn btn-primary" onclick="return confirmCancel();">hủy chuyến</a>
         </div>
       </form>
     </div>
@@ -207,6 +213,9 @@
 
 
   <script>
+    function confirmCancel() {
+      return confirm("Bạn có chắc chắn muốn hủy?");
+    }
     document.addEventListener("DOMContentLoaded", function() {
       var carSelect = document.getElementById("carSelect");
       var scheduleSelect = document.getElementById("scheduleSelect");

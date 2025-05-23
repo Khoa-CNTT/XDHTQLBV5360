@@ -118,6 +118,7 @@ public class TripSeviceImpl implements TripSevice {
         TripCard tripCard = new TripCard();
         // Id
         tripCard.setTripId(trip.getId());
+        tripCard.setRouteId(trip.getSchedule().getRoute().getId());
         System.out.println(" "+trip.getName());
 
         // name
@@ -180,6 +181,7 @@ public class TripSeviceImpl implements TripSevice {
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
 
         List<TripAdminDTO>  list = tripAdminDTOConver(tripRepository.findAll());
+        list.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
 
         int total = list.size();
         int start = (int) pageable.getOffset();
@@ -191,10 +193,19 @@ public class TripSeviceImpl implements TripSevice {
 
     @Override
     public List<TripAdminDTO> searchByDate(LocalDate date) {
-        List<Trip> trips = tripRepository.findByStartDate(date);
-
+       var trips = tripRepository.findByStartDate(date);
         return tripAdminDTOConver(trips);
     }
+
+    @Override
+    public List<TripAdminDTO> searchByDateForCheckin(LocalDate date) {
+        var tripsStartDate = tripRepository.findByStartDate(date);
+        List<Trip> trips = tripsStartDate.stream()
+                .filter(trip -> trip.getStatus() == TripStatus.BOOKED)
+                .toList();
+        return tripAdminDTOConver(trips);
+    }
+
 
     @Override
     public List<TripAdminDTO> searchByRoute(int route) {
@@ -283,32 +294,31 @@ public class TripSeviceImpl implements TripSevice {
 
     @Override
     public boolean addtrip(CreateTrip createTrip) {
-        Optional<Car> car = carRepository.findById(createTrip.getCarId());
-        if(!car.isPresent()){
-            return false;
-        }
-        Optional<Schedule> schedule = scheduleRopository.findById(createTrip.getScheduleId());
-        if(!schedule.isPresent()){
-            return false;
-        }
-        Optional<PriceList> priceList = priceListRepository.findById(createTrip.getPriceListId());
-        if(!priceList.isPresent()){
-            return false;
+        var car = carRepository.findById(createTrip.getCarId())
+                .orElseThrow(() -> new IllegalArgumentException("xe không tồn tại"));
+        var schedule = scheduleRopository.findById(createTrip.getScheduleId())
+                .orElseThrow(() -> new IllegalArgumentException("lịch trình không tồn tại"));
+        var priceList = priceListRepository.findById(createTrip.getPriceListId())
+                .orElseThrow(() -> new IllegalArgumentException("bảng giá không tồn tại"));
+        boolean flag  = tripRepository.existsConflictTrip(car.getId(),schedule.getId(), createTrip.getStartDate(), createTrip.getEndDate());
+
+        if (flag) {
+            throw new IllegalArgumentException("Xe này đã có chuyến bị trùng thời gian trong ngày " + createTrip.getStartDate());
         }
         Trip trip = new Trip();
         trip.setName(createTrip.getName());
         trip.setNote(createTrip.getNote());
         trip.setStartDate(createTrip.getStartDate());
         trip.setEndDate(createTrip.getEndDate());
-        trip.setCar(car.get());
-        trip.setSchedule(schedule.get());
-        trip.setPriceList(priceList.get());
+        trip.setCar(car);
+        trip.setSchedule(schedule);
+        trip.setPriceList(priceList);
         trip.setStatus(TripStatus.BOOKED);
 
         tripRepository.save(trip);
 
         List<Ticket> ticketList = new ArrayList<>();
-        List<Seat> seats = car.get().getSeats();
+        List<Seat> seats = car.getSeats();
         seats.forEach(seat ->{
             Ticket ticket = Ticket.fromSeat(seat,trip);
             ticketList.add(ticket);
@@ -332,9 +342,9 @@ public class TripSeviceImpl implements TripSevice {
                 .orElseThrow(() -> new IllegalArgumentException("bảng giá không tồn tại"));
 
 
-        List<Trip> conflicts = tripRepository.findTripsByCarAndStartDate(car.getId(),schedule.getId(), createTrip.getStartDate(), tripId);
+        boolean flag  = tripRepository.existsConflictTrip(trip.getId(), car.getId(),schedule.getId(), createTrip.getStartDate(), createTrip.getEndDate());
 
-        if (!conflicts.isEmpty()) {
+        if (flag) {
             throw new IllegalArgumentException("Xe này đã có chuyến bị trùng thời gian trong ngày " + createTrip.getStartDate());
         }
 
@@ -353,12 +363,23 @@ public class TripSeviceImpl implements TripSevice {
     @Override
     public void deleteTrip(int tripId) {
         Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new IllegalArgumentException("chuyến xe không tồn tại"));
+                .orElseThrow(() -> new IllegalArgumentException("Chuyến xe không tồn tại"));
+
+        List<Booking> bookings = trip.getBookings();
+
+        // Nếu có vé nào vẫn còn ở trạng thái khác CANCELLED thì không cho huỷ
+        boolean hasNonCancelledBooking = bookings.stream()
+                .anyMatch(booking -> booking.getStatus() != BookingStatus.CANCELLED);
+
+        if (hasNonCancelledBooking) {
+            throw new IllegalStateException("Không thể huỷ chuyến xe vì vẫn còn vé chưa bị huỷ.");
+        }
+
+        // Nếu không có booking hoặc tất cả đã CANCELLED → cho huỷ chuyến
         trip.setStatus(TripStatus.CANCELLED);
-
-        trip.getBookings().forEach(booking -> booking.setStatus(BookingStatus.CANCELLED));
-
         tripRepository.save(trip);
+
+        System.out.println("Đã huỷ chuyến xe ID = " + tripId);
     }
 
     @Override

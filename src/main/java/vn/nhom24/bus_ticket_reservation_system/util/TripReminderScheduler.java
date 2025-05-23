@@ -27,7 +27,7 @@ public class TripReminderScheduler {
     @Autowired
     private EmailSevice emailService;
 
-    @Scheduled(cron = "0 50 21 * * ?")
+    @Scheduled(cron = "0 55 15 * * ?")
     @Transactional
     public void sendTripReminders() throws IOException, WriterException {
         // Lấy danh sách booking các chuyến xe sẽ xuất phát trong 24 giờ tới

@@ -174,25 +174,23 @@ public class BookingConTroller {
 
                     paymentRepository.save(payment);
 
+                    //gửi email
+                    Map<String,Object> inforBooking = new HashMap<>();
+
+                    inforBooking.put("name",bookingDTO.getCustomerName());
+                    inforBooking.put("phoneNumber",bookingDTO.getCustomerPhone());
+                    inforBooking.put("listSeat",bookingDTO.getListSeat());
+                    inforBooking.put("tripName",bookingDTO.getTripName());
+                    inforBooking.put("starTime",bookingDTO.getStarTime());
+                    inforBooking.put("departureDate",bookingDTO.getDepartureDate());
+                    inforBooking.put("departureTime",bookingDTO.getDepartureTime());
+                    inforBooking.put("departureLocation",bookingDTO.getDepartureLocation());
+                    inforBooking.put("arrivalLocation",bookingDTO.getArrivalLocation());
+                    inforBooking.put("bookingCode",booking.getBookingCode());
+
+                    // gửi mail
+                    emailSevice.sendHtmlEmail(bookingDTO.getCustomerEmail(), EmailType.TICKET_CONFIRMATION,inforBooking);
                 }
-                //gửi email
-                Map<String,Object> inforBooking = new HashMap<>();
-
-                inforBooking.put("name",bookingDTO.getCustomerName());
-                inforBooking.put("phoneNumber",bookingDTO.getCustomerPhone());
-                inforBooking.put("listSeat",bookingDTO.getListSeat());
-                inforBooking.put("tripName",bookingDTO.getTripName());
-                inforBooking.put("starTime",bookingDTO.getStarTime());
-                inforBooking.put("departureDate",bookingDTO.getDepartureDate());
-                inforBooking.put("departureTime",bookingDTO.getDepartureTime());
-                inforBooking.put("departureLocation",bookingDTO.getDepartureLocation());
-                inforBooking.put("arrivalLocation",bookingDTO.getArrivalLocation());
-                inforBooking.put("bookingCode",String.valueOf(booking.getId()));
-
-                // gửi mail
-                emailSevice.sendHtmlEmail(bookingDTO.getCustomerEmail(), EmailType.TICKET_CONFIRMATION,inforBooking);
-
-
 
                 model.addAttribute("name",bookingDTO.getCustomerName());
                 model.addAttribute("tripName",bookingDTO.getTripName());
