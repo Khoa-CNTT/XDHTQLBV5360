@@ -87,10 +87,6 @@ public class TripController {
         // các chuyến xe thảo mãn điều kiện
         model.addAttribute("ListTrip",tripCards);
 
-        tripCards.forEach(tripCard -> {
-            System.out.println(tripCard.toString());
-        });
-
         return "public/booking";
     }
 }

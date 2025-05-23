@@ -81,7 +81,7 @@ public class BookingSeviceIpml implements BookingSevice {
     }
 
     @Override
-    public List<Booking> findPaidOrBookedByEmail(String email, List<BookingStatus> status , TripStatus trip) {
+    public List<Booking> findPaidByEmailNotRate(String email, List<BookingStatus> status , TripStatus trip) {
         return bookingReposity.findByEmailAndStatusIn(email,status,trip );
     }
 
@@ -104,7 +104,6 @@ public class BookingSeviceIpml implements BookingSevice {
     @Override
     public void updateStatus(Booking booking, BookingStatus bookingStatus) {
         if(bookingStatus == BookingStatus.BOOKED || bookingStatus == BookingStatus.PENDING){
-            booking.setBookingCode(UUID.randomUUID().toString());
             booking.getTickets().forEach( ticket -> {
                 ticketSevice.updateStatusById(ticket.getId(), SeatStatus.BOOKED);
             });

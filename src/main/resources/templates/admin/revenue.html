@@ -143,7 +143,7 @@
           <div>
             <div class="small text-white-50">Tổng doanh thu </div>
             <!-- Sửa tên thuộc tính/getter và định dạng BigDecimal -->
-            <div class="display-6" th:text="${#numbers.formatDecimal(summary.totalRevenue, 0, 'COMMA', 2, 'POINT')}" >0.00</div>
+            <div class="display-6" th:text="${#numbers.formatDecimal(summary.getTotalRevenue(), 0, 'COMMA', 0, 'POINT') + ' VNĐ'}" >0.00</div>
           </div>
           <div><i class="fas fa-money-bill-wave fa-2x"></i></div>
         </div>

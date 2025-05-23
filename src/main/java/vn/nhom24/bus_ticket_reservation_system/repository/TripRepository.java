@@ -46,11 +46,20 @@ public interface TripRepository extends JpaRepository<Trip,Integer> {
     // Tìm các chuyến đi bắt đầu vào một ngày cụ thể và theo route
     List<Trip> findByStartDateAndRoute(@Param("startDate") LocalDate startDate,@Param("routeId") int route);
 
-    @Query("SELECT t FROM Trip t WHERE t.car.id = :carId AND t.startDate = :startDate AND t.id <> :tripId AND t.schedule.id = :scheduleId")
-    List<Trip> findTripsByCarAndStartDate(
+    @Query("SELECT COUNT(t) > 0 FROM Trip t WHERE t.car.id = :carId AND t.id <> :tripId AND  t.schedule.id = :scheduleId AND t.tripStatus <> 'CANCELLED' AND NOT (:endDate < t.startDate OR :startDate > t.endDate) ")
+    boolean existsConflictTrip(
+            @Param("tripId") int tripId,
             @Param("carId") String carId,
             @Param("scheduleId") int scheduleId,
             @Param("startDate") LocalDate startDate,
-            @Param("tripId") Integer tripId
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT COUNT(t) > 0 FROM Trip t WHERE t.car.id = :carId AND  t.schedule.id = :scheduleId AND t.tripStatus <> 'CANCELLED' AND NOT (:endDate < t.startDate OR :startDate > t.endDate) ")
+    boolean existsConflictTrip(
+            @Param("carId") String carId,
+            @Param("scheduleId") int scheduleId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
     );
 }

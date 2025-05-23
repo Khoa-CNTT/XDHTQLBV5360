@@ -17,6 +17,7 @@ public class TripCard {
     private String departureLocation ; // Điểm xuất phát
     private String arrivalLocation ; // Điểm đến
     private String vehicleCategory; // loại xe
+    private int routeId; // id tuyến đường
 
     public TripCard() {
     }
@@ -135,6 +136,12 @@ public class TripCard {
 
     public void setPurchasedSeats(int purchasedSeats) {
         this.purchasedSeats = purchasedSeats;
+    }
+    public int getRouteId() {
+        return routeId;
+    }
+    public void setRouteId(int routeId) {
+        this.routeId = routeId;
     }
 
     @Override

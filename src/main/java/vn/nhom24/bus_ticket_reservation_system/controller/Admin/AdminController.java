@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,10 +47,10 @@ public class AdminController {
     CarRepository carRepository;
     PaymentService paymentService;
     RevenueService revenueService;
-    private final TripRepository tripRepository;
-    private final UserSevice userSevice;
-    private final RoleRepository roleRepository;
-    private final UserSeviceIpml userSeviceIpml;
+    TripRepository tripRepository;
+    UserSevice userSevice;
+    RoleRepository roleRepository;
+    UserSeviceIpml userSeviceIpml;
 
 
     @GetMapping()
@@ -145,32 +146,38 @@ public class AdminController {
         // Tìm theo điều kiện date nếu route không được cung cấp
         if (date != null && route == -1) {
             List<TripAdminDTO> listTrip = tripSevice.searchByDate(date);
+            listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
             model.addAttribute("listTrip",listTrip);
+            log.info("Tim kiem thoe nggay : " + date);
 
             // Tìm theo điều kiện route nếu date không được cung cấp
         } else if (date == null && route > 0) {
             List<TripAdminDTO> listTrip = tripSevice.searchByRoute(route);
+            listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
             model.addAttribute("listTrip",listTrip);
             // route đã chọn
             routeInput =  routes.stream()
                     .filter(route1 -> route1.getId() == route)
                     .findFirst()
                     .get();
+            log.info("Tim kiem thoe nggay : " + route);
             // Tìm theo cả hai điều kiện date và route nếu cả hai điều kiện đều tồn tại
         } else if (date != null && route >= 0) {
 
-            System.out.println(" day là loi của tìm theo date");
             if(route == 0){
-                System.out.println(" day là loi của tìm theo route = 0");
                 List<TripAdminDTO> listTrip = tripSevice.searchByDate(date);
+                listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
                 model.addAttribute("listTrip",listTrip);
+                log.info("Tim kiem thoe nggay : " + date);
             }else{
                 List<TripAdminDTO> listTrip = tripSevice.searchByDateAndRoute(date,route);
+                listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
                 model.addAttribute("listTrip",listTrip);
                 routeInput =  routes.stream()
                         .filter(route1 -> route1.getId() == route)
                         .findFirst()
                         .get();
+                log.info("Tim kiem thoe nggay : " + date + " va " + route);
             }
 
         } else {
@@ -191,6 +198,7 @@ public class AdminController {
                 model.addAttribute("startPage", startPage);
                 model.addAttribute("endPage", endPage);
             }
+            log.info("Tim kiem tat ca");
         }
 
         model.addAttribute("date",date);
@@ -252,8 +260,9 @@ public class AdminController {
             return "redirect:/error";
         }
 
-        tripRepository.save(trip);
+        trip = tripRepository.save(trip);
 
+        log.info("status trip : "+trip.getStatus());
         model.addAttribute("Payments",payments);
         model.addAttribute("trip",trip);
         return "admin/payment";
@@ -289,7 +298,7 @@ public class AdminController {
     }
 
     @PostMapping("/trip/{tripId}")
-    public String updateProduct(@PathVariable("tripId") int tripId, @ModelAttribute("createTrip") CreateTrip createTrip,
+    public String updateTrip(@PathVariable("tripId") int tripId, @ModelAttribute("createTrip") CreateTrip createTrip,
                                 BindingResult result, Model model) {
         Trip trip = tripSevice.findById(tripId);
         List<Car> carList = carRepository.findAll();
@@ -298,6 +307,7 @@ public class AdminController {
         List<Booking> bookings = bookingSevice.findByTripId(trip.getId());
         if (result.hasErrors()) {
             model.addAttribute("carList",carList);
+            model.addAttribute("trip",trip);
             model.addAttribute("scheduleList",scheduleList);
             model.addAttribute("priceListList",priceListList);
             model.addAttribute("createTrip",createTrip);
@@ -332,9 +342,19 @@ public class AdminController {
         try{
             tripSevice.deleteTrip(tripId);
         }catch (Exception e){
-            log.error("Error deleting trip: " + e.getMessage());
-            model.addAttribute("error", "Error deleting trip: " + e.getMessage());
-            return "admin/trip";
+            Trip trip = tripSevice.findById(tripId);
+            List<Car> carList = carRepository.findAll();
+            List<Schedule> scheduleList = scheduleRopository.findAll();
+            List<PriceList> priceListList = priceListRepository.findAll();
+            List<Booking> bookings = bookingSevice.findByTripId(trip.getId());
+            model.addAttribute("my_error", e.getMessage());
+            model.addAttribute("carList",carList);
+            model.addAttribute("trip",trip);
+            model.addAttribute("scheduleList",scheduleList);
+            model.addAttribute("createTrip",new CreateTrip());
+            model.addAttribute("priceListList",priceListList);
+            model.addAttribute("bookings",bookings);
+            return "admin/updateTrip";
         }
 
         return "redirect:/admin/trip";
@@ -403,32 +423,42 @@ public class AdminController {
         return "admin/createTrip";
     }
 
-    @PostMapping (value = "/trip/register")
-    public String saveTrip(@Valid @ModelAttribute("createTrip") CreateTrip createTrip, BindingResult result,Model model
-                           ){
+    @PostMapping("/trip/register")
+    public String saveTrip(@Valid @ModelAttribute("createTrip") CreateTrip createTrip,
+                           BindingResult result,
+                           Model model) {
+
+        if (result.hasErrors()) {
+            addTripFormAttributes(model);
+            model.addAttribute("errorMessage", "Dữ liệu không hợp lệ!");
+            return "admin/createTrip";
+        }
+
+        if (createTrip.getEndDate().isBefore(createTrip.getStartDate())) {
+            addTripFormAttributes(model);
+            model.addAttribute("errorMessage", "Ngày kết thúc phải lớn hơn ngày bắt đầu.");
+            return "admin/createTrip";
+        }
+
+        try {
+            if (tripSevice.addtrip(createTrip)) {
+                model.addAttribute("successMessage", "Thêm mới thành công.");
+            }
+        }catch (Exception e){
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+
+        addTripFormAttributes(model);
+        return "admin/createTrip";
+    }
+    private void addTripFormAttributes(Model model) {
         List<Car> carList = carRepository.findAll();
         List<Schedule> scheduleList = scheduleRopository.findAll();
         List<PriceList> priceListList = priceListRepository.findAll();
-        if (result.hasErrors()) {
 
-            model.addAttribute("carList",carList);
-            model.addAttribute("scheduleList",scheduleList);
-            model.addAttribute("priceListList",priceListList);
-            return "admin/createTrip";
-        }
-        String my_error = "";
-        if(tripSevice.addtrip(createTrip)){
-            my_error = "them moi thanh cong ";
-        }else{
-            my_error = "them moi thất bại ";
-        }
-
-
-        model.addAttribute("carList",carList);
-        model.addAttribute("scheduleList",scheduleList);
-        model.addAttribute("priceListList",priceListList);
-        model.addAttribute("my_error",my_error);
-        return "admin/createTrip";
+        model.addAttribute("carList", carList);
+        model.addAttribute("scheduleList", scheduleList);
+        model.addAttribute("priceListList", priceListList);
     }
 
 
@@ -502,7 +532,7 @@ public class AdminController {
                     startDate = LocalDate.now().minusYears(1);
                     endDate = LocalDate.now();
                     break;
-                case "QUARTER": // <-- Thêm case này
+                case "QUARTER":
                     // Kiểm tra xem quý và năm đã được chọn chưa
                     if (request.getSpecificQuarter() == null || request.getSpecificYear() == null) {
                         model.addAttribute("error", "Vui lòng chọn đủ quý và năm");

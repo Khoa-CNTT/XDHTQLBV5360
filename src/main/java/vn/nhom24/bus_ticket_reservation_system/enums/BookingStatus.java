@@ -5,6 +5,7 @@ public enum BookingStatus {
     CANCELLED("CANCELLED", "hủy"),// ghế đã có người mua và thanh toán
     PAID("PAID", "Đã thanh toán"), //Booking đã được thanh toán hoàn toàn.
     PENDING("PENDING", "Đợi xác nhận"),
+    COMPLETE("COMPLETE", "hoàn thành"),
     CHECKED_IN("CHECKED_IN","da check in"),;
 
     private final String status;

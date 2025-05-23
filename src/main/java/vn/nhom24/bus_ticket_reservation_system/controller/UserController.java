@@ -1,6 +1,7 @@
 package vn.nhom24.bus_ticket_reservation_system.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,9 @@ import vn.nhom24.bus_ticket_reservation_system.service.ipml.TripSeviceImpl;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RequestMapping("/user")
 @Controller
 public class UserController {
@@ -53,8 +56,7 @@ public class UserController {
     public String manageTickets(Model model, Principal principal) {
         String username = principal.getName();
         User user = userSevice.findByEmail(username);
-        List<Booking> bookings = bookingSevice.findPaidOrBookedByEmail(user.getEmail(),List.of(BookingStatus.PAID,BookingStatus.BOOKED), TripStatus.BOOKED);
-
+        List<Booking> bookings = bookingSevice.findPaidByEmailNotRate(user.getEmail(),List.of(BookingStatus.PAID), TripStatus.BOOKED);
 
         model.addAttribute("bookings", bookings);
         model.addAttribute("user", user);
@@ -77,7 +79,10 @@ public class UserController {
         }
         ratingSevice.saveRating(user, bookingId, point, describe);
 
-        List<Booking> bookings = bookingSevice.findPaidOrBookedByEmail(user.getEmail(), List.of(BookingStatus.PAID), TripStatus.COMPLETE);
+        List<Booking> bookings = bookingSevice.findPaidByEmailNotRate(user.getEmail(), List.of(BookingStatus.PAID), TripStatus.COMPLETE);
+        bookings.stream()
+                .filter(booking -> !booking.isRated())
+                .toList();
         model.addAttribute("bookings", bookings);
         model.addAttribute("my_error", my_error);
         model.addAttribute("user", user);
@@ -92,9 +97,11 @@ public class UserController {
     public String reviewTickets(Model model, Principal principal) {
         String username = principal.getName();
         User user = userSevice.findByEmail(username);
-        List<Booking> bookings = bookingSevice.findPaidOrBookedByEmail(user.getEmail(), List.of(BookingStatus.PAID), TripStatus.COMPLETE);
-
-
+        List<Booking> bookings = bookingSevice.findPaidByEmailNotRate(user.getEmail(), List.of(BookingStatus.PAID), TripStatus.COMPLETE);
+        bookings = bookings.stream()
+                .filter(booking -> !booking.isRated())
+                .toList();
+        bookings.forEach(booking -> {log.info("boking : "+booking.getId());});
         model.addAttribute("bookings", bookings);
         model.addAttribute("user", user);
         return "user/review";
