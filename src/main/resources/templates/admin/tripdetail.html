@@ -11,7 +11,65 @@
   <title>Tables - SB Admin</title>
 </head>
 <body>
-<div layout:fragment="content" >
+<div layout:fragment="content" class="container-fluid ">
+  <h1 class="mt-4">Quản lý chuyến xe</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/trip">Quản lý chuyến xe</a></li>
+    <li class="breadcrumb-item active">Chi tiết chuyến xe</li>
+  </ol>
+  <div class="card mt-3 container">
+    <div class="card-header">
+      <b>THÔNG TIN CHUYẾN XE</b>
+    </div>
+    <div class="card-body">
+      <form class="row g-3" method="post">
+
+        <!-- Xe -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Xe</label>
+          <input type="text" class="form-control"
+                 th:value="${trip.car.id + ' - (' + trip.car.name + ')'}" disabled>
+        </div>
+
+        <!-- Tên chuyến đi -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Tên chuyến đi</label>
+          <input type="text" class="form-control"
+                 th:value="${trip.name}" disabled>
+        </div>
+
+        <!-- Lịch trình -->
+        <div class="col-12">
+          <label class="form-label fw-semibold">Lịch trình</label>
+          <input type="text" class="form-control"
+                 th:value="${trip.schedule.scheduleName}" disabled>
+        </div>
+
+        <!-- Ngày khởi hành -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Ngày khởi hành</label>
+          <input type="date" class="form-control"
+                 th:value="${trip.getStartDate()}" disabled>
+        </div>
+
+        <!-- Ngày đến nơi -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Ngày đến nơi</label>
+          <input type="date" class="form-control"
+                 th:value="${trip.getEndDate()}" disabled>
+        </div>
+
+        <!-- Giá -->
+        <div class="col-12">
+          <label class="form-label fw-semibold">Giá</label>
+          <input type="text" class="form-control"
+                 th:value="${#numbers.formatCurrency(trip.getPriceList().getPrice())} +' - ' +${trip.getPriceList().getName()}" disabled>
+        </div>
+
+      </form>
+    </div>
+  </div>
   <div class="card mt-3">
     <div class="card-body">
       <div class="data_table">
@@ -24,7 +82,6 @@
             <th>ĐIỂM ĐẾN</th>
             <th>GHẾ NGỒI</th>
             <th>TRẠNG THÁI</th>
-            <th>Action</th>
           </tr>
           </thead>
           <tbody>
@@ -59,22 +116,6 @@
             </td>
             <td>
               <b th:text="${booking.getStatus().getDisplayName()}"></b>
-            </td>
-            <td>
-              <th:block th:if="${booking.status.getStatus() eq 'PENDING'}">
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal"
-                        th:attr="data-id=${booking.id},data-tripId=${trip.getId()}"  data-action="confirm">
-                  <i class="fa-solid fa-check fs-5"></i>
-                </button>
-              </th:block>
-
-              <!-- Nút Hủy -->
-              <th:block th:if="${booking.status.getStatus() ne 'CANCELLED'}">
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal"
-                        th:attr="data-id=${booking.id},data-tripId=${trip.getId()}" data-action="cancel">
-                  <i class="fa-solid fa-xmark fs-5"></i>
-                </button>
-              </th:block>
             </td>
           </tr>
           </tbody>

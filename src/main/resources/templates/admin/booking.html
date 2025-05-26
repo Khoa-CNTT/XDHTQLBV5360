@@ -99,7 +99,7 @@
                                 </th:block>
 
                                 <!-- Nút Hủy -->
-                                <th:block th:if="${booking.status.getStatus() ne 'CANCELLED'}">
+                                <th:block th:if="${booking.trip.tripStatus.getStatus() eq 'BOOKED'}">
                                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal"
                                             th:attr="data-id=${booking.id}" data-action="cancel">
                                         <i class="fa-solid fa-xmark fs-5"></i>

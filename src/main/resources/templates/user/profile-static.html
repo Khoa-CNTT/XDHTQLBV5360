@@ -1,91 +1,317 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" href="../../css/styles.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</head>
-<body style="background-color:  #F1F3FA">
-<nav class="navbar navbar-expand-lg  text-white " style=" background-color:#0D572B;">
-  <div class="container">
-    <a class=" navbar-brand nav-link " href="/">
-      <strong class="text-white fw-bold">XURIBUS</strong>
-    </a>
-    <div class="collapse navbar-collapse " id="navbarNavv">
-      <ul class="navbar-nav ">
-        <li class="nav-item">
-          <a class="nav-link active text-white" aria-current="page" href="#">Trang chủ</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#">hướng dẫn đặt vé</a>
-        </li>
-          <li class="nav-item">
-              <form action="#" th:action="@{/logout}" method="POST" class="nav-link text-white">
-                  <input type ="submit" class="dropdown-item" value="đăng xuất"/>
-              </form>
-          </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-<div class="container">
-    <div class="container">
-        <div class="row profile">
-            <div class="col-md-3">
-                <div class="profile-sidebar">
-                    <div class="profile-userpic d-flex justify-content-center">
-                      <img src="https://hocwebgiare.com/thiet_ke_web_chuan_demo/bootstrap_user_profile/images/profile_user.jpg"
-                            class="img-responsive" alt="Thông tin cá nhân">
-                    </div>
-                    <div class="profile-usertitle">
-                        <div class="profile-usertitle-name"  th:text="${user.getFullName()}" ></div>
-                    </div>
-                    <div class="profile-userbuttons">
-                        <button type="button" class="btn btn-success btn-sm">Chỉnh sửa trang cá nhân</button>
-                    </div>
-                    <div class="profile-usertitle">
-                        <div>
-                            <i class="fa-solid fa-envelope"></i> <span th:text="${user.getEmail()}"></span>
-                        </div>
-                        <div>
-                            <i class="fa-solid fa-phone"></i> <span th:text="${user.getPhoneNumber()}"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-9">
-              <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container-fluid">
-                  <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                      <li class="nav-item">
-                        <a class="nav-link "  th:href="@{/user/tickets}">Quản lý vé</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" th:href="@{/user/reviews}">Đánh giá vé</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" th:href="@{/user/change-password}">Đổi mật khẩu</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </nav>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXURY BUS</title>
 
-                <section layout:fragment="content">
-                    <!-- Nội dung trang con sẽ nhét vào đây -->
-                </section>
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="76x76" href="../../favicon/logo72x72.png">
+    <link rel="icon" type="image/icon" sizes="32x32" href="../../favicon/logo32x32.png">
+    <link rel="icon" type="image/icon" sizes="16x16" href="../../favicon/logo16x16.png">
+    <link rel="manifest" href="../../favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" href="../../css/main.css">
+
+    <!-- Add Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <!-- Add jQuery and Toastr JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <style>
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .profile-menu.active {
+            background-color: #e8f5e9;
+            border-left: 4px solid #28a745;
+        }
+
+        .profile-menu.active .profile-menu__title {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .user-menu__link.active {
+            background-color: #e8f5e9;
+            color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header id="header" class="header" style="height: 125px">
+        <div class="container">
+            <!-- Logo -->
+            <a id="home" th:href="@{/}" class="logo top-bar-logo">
+                <img src="../../icon/logo-primary.svg" alt="LUXURY BUS" class="top-bar-logo__img">
+            </a>
+
+            <div class="top-bar">
+                <!-- More -->
+                <button class="top-bar__more d-none d-lg-block">
+                    <img src="../../icon/more.svg" alt="" class="icon top-bar__more-icon">
+                </button>
+
+                <!-- Actions -->
+                <div class="top-act d-lg-none">
+                    <div class="top-act__user">
+                        <div class="d-flex justify-center items-center">
+                            <img src="../../imgs/avatar.png" alt="" class="top-act__avatar">
+                            <div class="text-white pl-4" th:text="${user.getFullName()}"></div>
+                            <img src="../../icon/icon_form_droplist.svg" alt="" class="pl-4">
+                        </div>
+
+                        <!-- Dropdown -->
+                        <div class="act-dropdown top-act__dropdown">
+                            <div class="act-dropdown__inner user-menu">
+                                <img src="../../icon/arrow-up.png" alt=""
+                                    class="act-dropdown__arrow top-act__dropdown-arrow">
+
+                                <div class="user-menu__top">
+                                    <img src="../../imgs/avatar.png" alt="" class="user-menu__avatar">
+                                    <div>
+                                        <p class="user-menu__name" th:text="${user.getFullName()}"></p>
+                                    </div>
+                                </div>
+
+                                <ul class="user-menu__list">
+                                    <li>
+                                        <a th:href="@{/user/info}" class="user-menu__link active">
+                                            <img src="../../icon/Profile.svg" alt="" class="user-menu__icon">
+                                            Thông tin tài khoản
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/user/tickets}" class="user-menu__link">
+                                            <img src="../../icon/History.svg" alt="" class="user-menu__icon">
+                                            Lịch sử mua vé
+                                        </a>
+                                    </li>
+                                    <li class="user-menu__separate">
+                                        <a th:href="@{/user/reviews}" class="user-menu__link">
+                                            <img src="../../icon/Address.svg" alt="" class="user-menu__icon">
+                                            Đánh giá vé
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/user/change-password}" class="user-menu__link">
+                                            <img src="../../icon/Password.svg" alt="" class="user-menu__icon">
+                                            Đặt lại mật khẩu
+                                        </a>
+                                    </li>
+                                    <li class="user-menu__separate">
+                                        <a href="#!" class="user-menu__link" th:href="@{/logout}">
+                                            <img src="../../icon/Logout.svg" alt="" class="user-menu__icon">
+                                            Đăng xuất
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More -->
+                <button class="top-bar__more d-none d-lg-block">
+                    <img src="../../icon/person.svg" alt="" class="icon top-bar__more-icon">
+                </button>
             </div>
         </div>
-    </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
-<script src="../js/scripts.js"></script>
-<script src="../js/bootstrap.bundle.js"></script>
+    </header>
+
+    <!-- Main -->
+    <main class="profile">
+        <div class="container">
+            <!-- Profile content -->
+            <div class="profile-container">
+                <div class="row gy-md-3">
+                    <div class="col-3 col-xl-4 d-lg-none">
+                        <aside class="profile__sidebar">
+                            <!-- Menu 1 -->
+                            <a th:href="@{/user/info}" class="profile-menu active">
+                                <img src="../../icon/Profile.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Thông tin tài khoản</span>
+                            </a>
+
+                            <!-- Menu 2 -->
+                            <a th:href="@{/user/tickets}" class="profile-menu">
+                                <img src="../../icon/History.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Lịch sử mua vé</span>
+                            </a>
+
+                            <!-- Menu 3 -->
+                            <a th:href="@{/user/reviews}" class="profile-menu">
+                                <img src="../../icon/Address.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Đánh giá vé</span>
+                            </a>
+
+                            <!-- Menu 4 -->
+                            <a th:href="@{/user/change-password}" class="profile-menu">
+                                <img src="../../icon/Password.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Đặt lại mật khẩu</span>
+                            </a>
+                            <!-- Menu 5 -->
+                            <a th:href="@{/logout}" class="profile-menu">
+                                <img src="../../icon/Logout.svg" alt="" class="profile-menu__icon">
+                                <span class="profile-menu__title">Đăng xuất</span>
+                            </a>
+                        </aside>
+                    </div>
+                    <div class="col-9 col-xl-8 col-lg-12">
+                        <div class="profile-sidebar">
+                            <div class="row gy-3">
+                                <div class="col-12">
+                                    <h2 class="profile-sidebar__heading">
+                                        <a th:href="@{/user/info}">
+                                            <img src="../../icon/arrow-left.svg" alt=""
+                                                class="icon profile-sidebar__icon">
+                                        </a>
+                                        Thông tin tài khoản
+                                    </h2>
+                                    <p class="profile-sidebar__desc">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+
+                                    <form th:action="@{/user/update}" method="post" class="form form-card"
+                                        id="profileForm">
+                                        <!-- Form row 1 -->
+                                        <div class="form__row">
+                                            <div class="form__group">
+                                                <label for="fullName" class="form__label form-card__label">Họ và
+                                                    tên</label>
+                                                <div class="form__text-input">
+                                                    <input type="text" th:value="${user.fullName}" name="fullName"
+                                                        id="fullName" placeholder="Họ và tên" class="form__input"
+                                                        required>
+                                                </div>
+                                            </div>
+                                            <div class="form__group">
+                                                <label for="email" class="form__label form-card__label">Email</label>
+                                                <div class="form__text-input">
+                                                    <input type="email" disabled th:value="${user.email}" name="email"
+                                                        id="email" placeholder="Email" class="form__input" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Form row 2 -->
+                                        <div class="form__row">
+                                            <div class="form__group">
+                                                <label for="phoneNumber" class="form__label form-card__label">Số điện
+                                                    thoại</label>
+                                                <div class="form__text-input">
+                                                    <input type="tel" th:value="${user.phoneNumber}" name="phoneNumber"
+                                                        id="phoneNumber" placeholder="Số điện thoại" class="form__input"
+                                                        required>
+                                                </div>
+                                            </div>
+                                            <div class="form__group">
+                                                <label for="role" class="form__label form-card__label">Vai trò</label>
+                                                <div class="form__text-input">
+                                                    <input disabled type="text" name="role" id="role"
+                                                        th:value="${user.roles[0].name == 'ROLE_USER' ? 'Người dùng' :
+                                                                 (user.roles[0].name == 'ROLE_ADMIN' ? 'Quản trị viên' :
+                                                                 (user.roles[0].name == 'ROLE_DRIVER' ? 'Tài xế' : user.roles))}" class="form__input" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <script th:inline="javascript">
+                                        $(document).ready(function () {
+                                            // Configure Toastr
+                                            toastr.options = {
+                                                "closeButton": true,
+                                                "progressBar": true,
+                                                "positionClass": "toast-top-right",
+                                                "timeOut": "3000",
+                                                "extendedTimeOut": "1000",
+                                                "preventDuplicates": true,
+                                                "newestOnTop": true
+                                            };
+
+                                            // Show success message if exists
+                                            const successMessage = /*[[${Message}]]*/ null;
+                                            if (successMessage) {
+                                                toastr.success(successMessage);
+                                            }
+
+                                            // Show error message if exists
+                                            const errorMessage = /*[[${error}]]*/ null;
+                                            if (errorMessage) {
+                                                toastr.error(errorMessage);
+                                            }
+
+                                            // Form submission handler
+                                            $('#profileForm').on('submit', function (e) {
+                                                e.preventDefault();
+
+                                                // Basic validation
+                                                let isValid = true;
+                                                let errorMessage = '';
+
+                                                // Check required fields
+                                                $(this).find('input[required]').each(function () {
+                                                    if (!$(this).val()) {
+                                                        isValid = false;
+                                                        errorMessage = 'Vui lòng điền đầy đủ thông tin';
+                                                        return false;
+                                                    }
+                                                });
+
+                                                // Validate email format
+                                                const email = $('#email').val();
+                                                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                                if (!emailRegex.test(email)) {
+                                                    isValid = false;
+                                                    errorMessage = 'Email không hợp lệ';
+                                                }
+
+                                                // Validate phone number format
+                                                const phoneNumber = $('#phoneNumber').val();
+                                                const phoneRegex = /^[0-9]{10}$/;
+                                                if (!phoneRegex.test(phoneNumber)) {
+                                                    isValid = false;
+                                                    errorMessage = 'Số điện thoại phải có 10 chữ số';
+                                                }
+
+                                                if (!isValid) {
+                                                    toastr.error(errorMessage);
+                                                    return false;
+                                                }
+
+                                                // If validation passes, submit the form
+                                                this.submit();
+                                            });
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{public/footer}"></div>
+
 </body>
+
 </html>

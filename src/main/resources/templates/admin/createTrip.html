@@ -11,15 +11,22 @@
   <title>Tables - SB Admin</title>
 </head>
 <body>
-<div layout:fragment="content" class="container">
-  <div class="card mt-3">
+<div layout:fragment="content" class="container-fluid px-4">
+  <h1 class="mt-4">Quản lý chuyến xe</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/trip">Quản lý chuyến xe</a></li>
+    <li class="breadcrumb-item active">Thêm mới chuyến xe</li>
+  </ol>
+  <div class="card my-3 col-md-8 mx-auto">
     <div class="card-header">
       Thêm mới chuyến đi
     </div>
-    <div class="card-body">
-      <div class="col-md-6 col-lg-offset-3 mt-20 alert alert-success" th:if="${my_error}" >
-        <span th:text="${my_error}"> </span>
-      </div>
+    <div class="card-body ">
+      <!-- Hiển thị thông báo lỗi -->
+      <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+      <!-- Hiển thị thông báo thành công -->
+      <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
       <form class="row g-3"  th:action="@{/admin/trip/register}"  th:object="${createTrip}" method="post">
 
         <div class="col-md-6">
@@ -54,13 +61,15 @@
         <div class="col-md-6">
           <label  class="form-label fw-semibold">Ngày khởi hành</label>
           <input type="date" class="form-control" id="date"
-                 th:field="*{startDate}" th:errorclass="is-invalid">
+                 th:field="*{startDate}" th:errorclass="is-invalid"
+                 th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
           <div th:if="${#fields.hasErrors('startDate')}"  th:errors="*{startDate}" class="invalid-feedback"></div>
         </div>
         <div class="col-md-6">
           <label  class="form-label fw-semibold">Ngày đến nơi</label>
           <input  type="date" class="form-control" id="datei"
-                 th:field="*{endDate}" th:errorclass="is-invalid">
+                  th:field="*{endDate}" th:errorclass="is-invalid"
+                  th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
           <div th:if="${#fields.hasErrors('endDate')}"  th:errors="*{endDate}" class="invalid-feedback"></div>
         </div>
         <div class="col-12">
@@ -163,7 +172,6 @@
 
   </script>
 </div>
-
 <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

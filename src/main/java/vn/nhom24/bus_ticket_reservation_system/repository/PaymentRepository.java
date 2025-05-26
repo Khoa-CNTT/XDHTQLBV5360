@@ -53,6 +53,7 @@ public interface PaymentRepository extends JpaRepository<Payment,Integer> {
         WHERE
             (:routeName IS NULL OR r.route_name = :routeName)
             AND paid_payments.booking_id IS NOT NULL
+            AND t.status IN ('COMPLETE')
         GROUP BY
             r.route_id, r.route_name
         ORDER BY

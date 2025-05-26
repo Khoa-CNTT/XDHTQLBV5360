@@ -19,15 +19,16 @@ import vn.nhom24.bus_ticket_reservation_system.enums.BookingStatus;
 import vn.nhom24.bus_ticket_reservation_system.enums.PaymentStatus;
 import vn.nhom24.bus_ticket_reservation_system.enums.TripStatus;
 import vn.nhom24.bus_ticket_reservation_system.repository.*;
-import vn.nhom24.bus_ticket_reservation_system.service.BookingSevice;
-import vn.nhom24.bus_ticket_reservation_system.service.PaymentService;
-import vn.nhom24.bus_ticket_reservation_system.service.RevenueService;
-import vn.nhom24.bus_ticket_reservation_system.service.TripSevice;
+import vn.nhom24.bus_ticket_reservation_system.service.*;
+import vn.nhom24.bus_ticket_reservation_system.service.ipml.UserSeviceIpml;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,7 +37,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class AdminController {
-
+    ScheduleService scheduleService;
+    CarService carService;
     BookingSevice bookingSevice;
     TripSevice tripSevice;
     PriceListRepository priceListRepository;
@@ -45,7 +47,10 @@ public class AdminController {
     CarRepository carRepository;
     PaymentService paymentService;
     RevenueService revenueService;
-    private final TripRepository tripRepository;
+    TripRepository tripRepository;
+    UserSevice userSevice;
+    RoleRepository roleRepository;
+    UserSeviceIpml userSeviceIpml;
 
 
     @GetMapping()
@@ -141,37 +146,42 @@ public class AdminController {
         // Tìm theo điều kiện date nếu route không được cung cấp
         if (date != null && route == -1) {
             List<TripAdminDTO> listTrip = tripSevice.searchByDate(date);
+            listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
             model.addAttribute("listTrip",listTrip);
+            log.info("Tim kiem thoe nggay : " + date);
 
             // Tìm theo điều kiện route nếu date không được cung cấp
         } else if (date == null && route > 0) {
             List<TripAdminDTO> listTrip = tripSevice.searchByRoute(route);
+            listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
             model.addAttribute("listTrip",listTrip);
             // route đã chọn
             routeInput =  routes.stream()
                     .filter(route1 -> route1.getId() == route)
                     .findFirst()
                     .get();
+            log.info("Tim kiem thoe nggay : " + route);
             // Tìm theo cả hai điều kiện date và route nếu cả hai điều kiện đều tồn tại
         } else if (date != null && route >= 0) {
 
-            System.out.println(" day là loi của tìm theo date");
             if(route == 0){
-                System.out.println(" day là loi của tìm theo route = 0");
                 List<TripAdminDTO> listTrip = tripSevice.searchByDate(date);
+                listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
                 model.addAttribute("listTrip",listTrip);
+                log.info("Tim kiem thoe nggay : " + date);
             }else{
                 List<TripAdminDTO> listTrip = tripSevice.searchByDateAndRoute(date,route);
+                listTrip.sort(Comparator.comparing(TripAdminDTO::getDepartureTime).reversed());
                 model.addAttribute("listTrip",listTrip);
                 routeInput =  routes.stream()
                         .filter(route1 -> route1.getId() == route)
                         .findFirst()
                         .get();
+                log.info("Tim kiem thoe nggay : " + date + " va " + route);
             }
 
         } else {
 
-            System.out.println(" day là loi của tìm BANTUMLUON ");
             Page<TripAdminDTO> listTrip = tripSevice.getAll(pageNo);
             model.addAttribute("listTrip",listTrip);
 
@@ -188,6 +198,7 @@ public class AdminController {
                 model.addAttribute("startPage", startPage);
                 model.addAttribute("endPage", endPage);
             }
+            log.info("Tim kiem tat ca");
         }
 
         model.addAttribute("date",date);
@@ -249,8 +260,9 @@ public class AdminController {
             return "redirect:/error";
         }
 
-        tripRepository.save(trip);
+        trip = tripRepository.save(trip);
 
+        log.info("status trip : "+trip.getStatus());
         model.addAttribute("Payments",payments);
         model.addAttribute("trip",trip);
         return "admin/payment";
@@ -286,7 +298,7 @@ public class AdminController {
     }
 
     @PostMapping("/trip/{tripId}")
-    public String updateProduct(@PathVariable("tripId") int tripId, @ModelAttribute("createTrip") CreateTrip createTrip,
+    public String updateTrip(@PathVariable("tripId") int tripId, @ModelAttribute("createTrip") CreateTrip createTrip,
                                 BindingResult result, Model model) {
         Trip trip = tripSevice.findById(tripId);
         List<Car> carList = carRepository.findAll();
@@ -295,6 +307,7 @@ public class AdminController {
         List<Booking> bookings = bookingSevice.findByTripId(trip.getId());
         if (result.hasErrors()) {
             model.addAttribute("carList",carList);
+            model.addAttribute("trip",trip);
             model.addAttribute("scheduleList",scheduleList);
             model.addAttribute("priceListList",priceListList);
             model.addAttribute("createTrip",createTrip);
@@ -329,9 +342,19 @@ public class AdminController {
         try{
             tripSevice.deleteTrip(tripId);
         }catch (Exception e){
-            log.error("Error deleting trip: " + e.getMessage());
-            model.addAttribute("error", "Error deleting trip: " + e.getMessage());
-            return "admin/trip";
+            Trip trip = tripSevice.findById(tripId);
+            List<Car> carList = carRepository.findAll();
+            List<Schedule> scheduleList = scheduleRopository.findAll();
+            List<PriceList> priceListList = priceListRepository.findAll();
+            List<Booking> bookings = bookingSevice.findByTripId(trip.getId());
+            model.addAttribute("my_error", e.getMessage());
+            model.addAttribute("carList",carList);
+            model.addAttribute("trip",trip);
+            model.addAttribute("scheduleList",scheduleList);
+            model.addAttribute("createTrip",new CreateTrip());
+            model.addAttribute("priceListList",priceListList);
+            model.addAttribute("bookings",bookings);
+            return "admin/updateTrip";
         }
 
         return "redirect:/admin/trip";
@@ -400,32 +423,42 @@ public class AdminController {
         return "admin/createTrip";
     }
 
-    @PostMapping (value = "/trip/register")
-    public String saveTrip(@Valid @ModelAttribute("createTrip") CreateTrip createTrip, BindingResult result,Model model
-                           ){
+    @PostMapping("/trip/register")
+    public String saveTrip(@Valid @ModelAttribute("createTrip") CreateTrip createTrip,
+                           BindingResult result,
+                           Model model) {
+
+        if (result.hasErrors()) {
+            addTripFormAttributes(model);
+            model.addAttribute("errorMessage", "Dữ liệu không hợp lệ!");
+            return "admin/createTrip";
+        }
+
+        if (createTrip.getEndDate().isBefore(createTrip.getStartDate())) {
+            addTripFormAttributes(model);
+            model.addAttribute("errorMessage", "Ngày kết thúc phải lớn hơn ngày bắt đầu.");
+            return "admin/createTrip";
+        }
+
+        try {
+            if (tripSevice.addtrip(createTrip)) {
+                model.addAttribute("successMessage", "Thêm mới thành công.");
+            }
+        }catch (Exception e){
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+
+        addTripFormAttributes(model);
+        return "admin/createTrip";
+    }
+    private void addTripFormAttributes(Model model) {
         List<Car> carList = carRepository.findAll();
         List<Schedule> scheduleList = scheduleRopository.findAll();
         List<PriceList> priceListList = priceListRepository.findAll();
-        if (result.hasErrors()) {
 
-            model.addAttribute("carList",carList);
-            model.addAttribute("scheduleList",scheduleList);
-            model.addAttribute("priceListList",priceListList);
-            return "admin/createTrip";
-        }
-        String my_error = "";
-        if(tripSevice.addtrip(createTrip)){
-            my_error = "them moi thanh cong ";
-        }else{
-            my_error = "them moi thất bại ";
-        }
-
-
-        model.addAttribute("carList",carList);
-        model.addAttribute("scheduleList",scheduleList);
-        model.addAttribute("priceListList",priceListList);
-        model.addAttribute("my_error",my_error);
-        return "admin/createTrip";
+        model.addAttribute("carList", carList);
+        model.addAttribute("scheduleList", scheduleList);
+        model.addAttribute("priceListList", priceListList);
     }
 
 
@@ -499,6 +532,49 @@ public class AdminController {
                     startDate = LocalDate.now().minusYears(1);
                     endDate = LocalDate.now();
                     break;
+                case "QUARTER":
+                    // Kiểm tra xem quý và năm đã được chọn chưa
+                    if (request.getSpecificQuarter() == null || request.getSpecificYear() == null) {
+                        model.addAttribute("error", "Vui lòng chọn đủ quý và năm");
+                        return setupModel(model, request);
+                    }
+
+                    int specificQuarter = request.getSpecificQuarter();
+                    int specificYear = request.getSpecificYear();
+                    int startMonth;
+                    int endMonth;
+
+                    // Xác định tháng bắt đầu và kết thúc của quý
+                    switch (specificQuarter) {
+                        case 1: // Quý 1: Tháng 1, 2, 3
+                            startMonth = 1;
+                            endMonth = 3;
+                            break;
+                        case 2: // Quý 2: Tháng 4, 5, 6
+                            startMonth = 4;
+                            endMonth = 6;
+                            break;
+                        case 3: // Quý 3: Tháng 7, 8, 9
+                            startMonth = 7;
+                            endMonth = 9;
+                            break;
+                        case 4: // Quý 4: Tháng 10, 11, 12
+                            startMonth = 10;
+                            endMonth = 12;
+                            break;
+                        default:
+                            // Xử lý trường hợp quý không hợp lệ
+                            model.addAttribute("error", "Quý không hợp lệ (phải từ 1 đến 4)");
+                            return setupModel(model, request);
+                    }
+
+                    // Tính ngày bắt đầu (ngày 1 của tháng bắt đầu)
+                    startDate = LocalDate.of(specificYear, startMonth, 1);
+                    // Tính ngày kết thúc (ngày cuối cùng của tháng kết thúc)
+                    endDate = LocalDate.of(specificYear, endMonth, 1)
+                            .with(TemporalAdjusters.lastDayOfMonth()); // Sử dụng TemporalAdjusters
+
+                    break;
                 case "SPECIFIC_MONTH":
                     if (request.getSpecificMonth() == null || request.getSpecificYear() == null) {
                         model.addAttribute("error", "Vui lòng chọn đủ tháng và năm");
@@ -543,4 +619,187 @@ public class AdminController {
         model.addAttribute("routes", revenueService.getAllRoutes());
         return "admin/revenue";
     }
+
+
+
+    // manager user
+    @GetMapping(value = "/users")
+    public String users(Model model,
+                        @RequestParam(name = "page",defaultValue = "1") int pageNo
+    ){
+        Page<User> users = userSevice.getAll(pageNo);
+
+        if (users != null) {
+            int totalPages = users.getTotalPages();
+            int range = 1;
+            // Tính toán trang bắt đầu và kết thúc
+            int startPage = Math.max(1, pageNo - range);
+            int endPage = Math.min(totalPages, pageNo + range);
+
+
+            model.addAttribute("currentPage", pageNo);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("startPage", startPage);
+            model.addAttribute("endPage", endPage);
+        }
+        model.addAttribute("users",users);
+        return "admin/users";
+    }
+
+
+    @GetMapping(value = "/users/showRegisterForm")
+    public String showRegisterForm(@RequestParam(value = "error", required = false) String error,Model model){
+        List<Role> roles = roleRepository.findAll();
+        model.addAttribute("registerUser",new AdminRegisterUser());
+        model.addAttribute("roles",roles);
+        return "admin/register-user";
+    }
+
+
+
+    @PostMapping(value = "/users/process")
+    public String process(@Valid @ModelAttribute("registerUser") AdminRegisterUser registerUser,
+                          BindingResult result,
+                          Model model
+    ){
+        // form validation
+        if(result.hasErrors()){
+            List<Role> roles = roleRepository.findAll();
+            model.addAttribute("roles",roles);
+            return "admin/register-user";
+        }
+
+        // kiểm tra xem số email đã tồn tại hay chưa
+        User userExisting = userSevice.findByEmail(registerUser.getEmail());
+
+        if(userExisting != null){
+            model.addAttribute("my_error", "Email đã được đăng ký");
+            List<Role> roles = roleRepository.findAll();
+            model.addAttribute("roles",roles);
+            return "admin/register-user";
+        }
+
+        userSeviceIpml.save(registerUser);
+        List<Role> roles = roleRepository.findAll();
+        model.addAttribute("roles",roles);
+        model.addAttribute("my_error", "đăng ký tài khoản không thành công");
+        return "admin/register-user";
+    }
+
+    @GetMapping("/users/edit/{id}")
+    public String editUserForm(@PathVariable int id, Model model) {
+        User user = userSevice.findById(id);
+
+        // Kiểm tra nếu không tìm thấy người dùng
+        if (user == null) {
+            // Xử lý trường hợp không tìm thấy người dùng, ví dụ: chuyển hướng về danh sách
+            return "redirect:/admin/users?error=UserNotFound"; // Hoặc thêm thông báo lỗi vào flash attributes
+        }
+
+        // Tạo một instance của AdminUpdateUserDto (DTO mới dùng cho update)
+        AdminUpdateUserDto dto = new AdminUpdateUserDto();
+
+        // Ánh xạ dữ liệu từ entity User sang DTO
+        dto.setId(user.getId());
+        dto.setFullName(user.getFullName());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setRole(user.getRoles().iterator().next().getName());
+
+
+        List<Role> roles = roleRepository.findAll();
+        model.addAttribute("adminUpdateUserDto", dto);
+        model.addAttribute("roles", roles);
+        return "admin/edit-user";
+    }
+
+
+    @PostMapping("/users/update")
+    public String updateUser(@Valid @ModelAttribute("adminUpdateUserDto") AdminUpdateUserDto adminUpdateUserDto, // <-- Sử dụng DTO mới
+                             BindingResult result,
+                             Model model) {
+
+        // Luôn thêm roles vào model
+        List<Role> roles = roleRepository.findAll();
+        model.addAttribute("roles", roles);
+
+
+        if (result.hasErrors()) {
+            model.addAttribute("registerUser", adminUpdateUserDto); // <-- Thêm lại DTO vào model
+            return "admin/edit-user"; // Trả về trang sửa với lỗi validation
+        }
+
+        User existingUser = userSevice.findByEmail(adminUpdateUserDto.getEmail());
+        boolean isSameUser =  existingUser.getId() == adminUpdateUserDto.getId();
+        if (existingUser != null && !isSameUser) {
+            model.addAttribute("my_error", "Email đã được đăng ký cho người dùng khác");
+            model.addAttribute("registerUser", adminUpdateUserDto);
+            log.info("Email đã được đăng ký cho người dùng khác");
+            return "admin/edit-user";
+        }
+
+
+        // Cập nhật - Cần phương thức update trong service chấp nhận AdminUpdateUserDto
+        // Bạn có thể cần ánh xạ từ adminUpdateUserDto sang entity User
+        userSevice.updateFromDto(adminUpdateUserDto); // Tên phương thức mới trong service
+
+        // Nếu OK thì quay về danh sách
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/activate/{id}")
+    public String setActiveUser(@PathVariable int id) {
+
+        userSevice.updateUserActiveStatus(id, true);
+
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/deactivate/{id}")
+    public String deactivateUser(@PathVariable int id) {
+
+        userSevice.updateUserActiveStatus(id, false);
+
+        return "redirect:/admin/users";
+    }
+
+
+    // quản lý xe
+    @GetMapping("/cars")
+    public String listCars(Model model) {
+        List<Car> cars = carService.findAll();
+        model.addAttribute("cars", cars);
+        return "admin/car-list"; // trỏ tới car-list.html
+    }
+
+    @GetMapping("/schedules") // Endpoint cho danh sách lịch trình
+    public String listSchedules(Model model) {
+        // Lấy danh sách tất cả lịch trình từ service (hoặc repository)
+        List<ScheduleDisplayDto> scheduleDtos = scheduleService.findAllScheduleDisplayDtos();
+        log.info("scheduleDtos size: " + scheduleDtos.size());
+
+        // Thêm danh sách lịch trình vào model với tên "schedules"
+        model.addAttribute("schedules", scheduleDtos);
+
+        // Trả về tên view template (tạo file này ở bước 4)
+        return "admin/schedule-list";
+    }
+
+
+    @GetMapping("/schedules/details/{id}")
+    public String viewScheduleDetails(@PathVariable("id") int scheduleId, Model model) {
+        Optional<ScheduleDetailViewDto> scheduleDetailOpt = scheduleService.findScheduleDetailViewById(scheduleId);
+
+        if (scheduleDetailOpt.isPresent()) {
+            model.addAttribute("schedule", scheduleDetailOpt.get());
+            return "admin/schedule-details"; // Tên view template mới
+        } else {
+            // Xử lý trường hợp không tìm thấy lịch trình
+            model.addAttribute("errorMessage", "Không tìm thấy lịch trình với ID: " + scheduleId);
+            return "redirect:/admin/schedules"; // Chuyển hướng về trang danh sách
+        }
+    }
+
+
+
 }

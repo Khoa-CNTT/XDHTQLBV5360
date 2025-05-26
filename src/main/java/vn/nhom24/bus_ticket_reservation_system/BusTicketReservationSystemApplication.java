@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import vn.nhom24.bus_ticket_reservation_system.enums.EmailType;
 import vn.nhom24.bus_ticket_reservation_system.service.EmailSevice;
 
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootApplication
+@EnableScheduling
 public class BusTicketReservationSystemApplication {
 
 	public static void main(String[] args) {

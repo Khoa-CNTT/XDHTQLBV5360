@@ -41,6 +41,7 @@ public interface TripSevice {
 
     // Tìm Trip theo điều kiện date
     List<TripAdminDTO> searchByDate(LocalDate date) ;
+    List<TripAdminDTO> searchByDateForCheckin(LocalDate date) ;
 
     // Tìm Trip theo điều kiện rote
     List<TripAdminDTO> searchByRoute(int route) ;

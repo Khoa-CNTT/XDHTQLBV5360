@@ -35,7 +35,7 @@ public class DriverController {
 
     @GetMapping(value = "/bus")
     public String checkIn(Model model){
-        List<TripAdminDTO> trips = tripSevice.searchByDate(LocalDate.now());
+        List<TripAdminDTO> trips = tripSevice.searchByDateForCheckin(LocalDate.now());
 
         model.addAttribute("trips", trips);
         return "admin/bus";

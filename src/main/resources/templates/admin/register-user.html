@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="admin/dashboardLayout.html">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Tables - SB Admin</title>
+</head>
+<body>
+<div layout:fragment="content"  class="container-fluid px-4">
+  <h1 class="mt-4">Quản lý người dùng</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/users">Quản lý người dùng</a></li>
+    <li class="breadcrumb-item active">tạo tài khoản</li>
+  </ol>
+  <div class="card my-3 col-md-4 mx-auto">
+    <div class="card-header">
+      tạo tài khoản mới
+    </div>
+    <div class="card-body ">
+      <div class="col-md-12 col-lg-offset-3 mt-20 alert alert-success" th:if="${my_error}" >
+        <span th:text="${my_error}"> </span>
+      </div>
+      <form class="row g-3" th:action="@{/admin/users/process}"  th:object="${registerUser}" method="post">
+        <div class="form__group">
+          <div class="form__text-input flex">
+            <input type="text" name="fullName" id="inputFullName" placeholder="Tên đầy đủ"
+                   th:field="*{fullName}" class="form__input form-control" required>
+          </div>
+          <div th:if="${#fields.hasErrors('fullName')}" class="notification notification--error">
+            <i class='bx bx-error-circle notification__icon'></i>
+            <div class="notification__content">
+              <p class="notification__message" th:each="err : ${#fields.errors('fullName')}"
+                 th:text="${err}"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form__group">
+          <div class="form__text-input flex">
+            <input type="text" name="phoneNumber" id="inputPhoneNumber" th:field="*{phoneNumber}"
+                   placeholder="Nhập số điện thoại" class="form__input form-control" required>
+          </div>
+          <div th:if="${#fields.hasErrors('phoneNumber')}" class="notification notification--error">
+            <i class='bx bx-error-circle notification__icon'></i>
+            <div class="notification__content">
+              <p class="notification__message" th:each="err : ${#fields.errors('phoneNumber')}"
+                 th:text="${err}"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form__group">
+          <div class="form__text-input flex">
+            <input type="email" name="email" id="inputEmail" th:field="*{email}"
+                   placeholder="Nhập email" class="form__input form-control" required>
+          </div>
+          <div th:if="${#fields.hasErrors('email')}" class="notification notification--error">
+            <i class='bx bx-error-circle notification__icon'></i>
+            <div class="notification__content">
+              <p class="notification__message" th:each="err : ${#fields.errors('email')}"
+                 th:text="${err}"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form__group">
+          <div class="form__text-input flex">
+            <input type="password" th:field="*{passWord}" name="passWord" id="inputPassword"
+                   placeholder="Mật khẩu" class="form__input form-control" required minlength="6">
+          </div>
+          <div th:if="${#fields.hasErrors('passWord')}" class="notification notification--error">
+            <i class='bx bx-error-circle notification__icon'></i>
+            <div class="notification__content">
+              <p class="notification__message" th:each="err : ${#fields.errors('passWord')}"
+                 th:text="${err}"></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label fw-semibold">Vai trò</label>
+          <select id="carSelect" class="form-select" aria-label="Default select example"  th:field="*{role}" th:errorclass="is-invalid">
+            <option value="" th:selected="false"> Vai trò </option>
+            <option th:each="role : ${roles}"
+                    th:value="${role.name}"
+                    th:text="${role.name}"
+            >
+            </option>
+          </select>
+          <div th:if="${#fields.hasErrors('role')}"  th:errors="*{role}" class="invalid-feedback"></div>
+
+          <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary">Thêm</button>
+            <a th:href="@{/admin/users}" class="btn btn-primary">hủy</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

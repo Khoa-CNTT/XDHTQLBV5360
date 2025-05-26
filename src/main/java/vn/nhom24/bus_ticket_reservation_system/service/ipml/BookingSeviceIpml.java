@@ -81,7 +81,7 @@ public class BookingSeviceIpml implements BookingSevice {
     }
 
     @Override
-    public List<Booking> findPaidOrBookedByEmail(String email, List<BookingStatus> status , TripStatus trip) {
+    public List<Booking> findPaidByEmailNotRate(String email, List<BookingStatus> status , TripStatus trip) {
         return bookingReposity.findByEmailAndStatusIn(email,status,trip );
     }
 

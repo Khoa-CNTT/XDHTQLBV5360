@@ -17,7 +17,7 @@
   </ol>
 
   <!-- Form lọc -->
-  <form th:action="@{/admin/dashboard}" method="get" class="mb-4 bg-white p-4 rounded shadow">
+  <form th:action="@{/admin/dashboard}" method="get" class="mb-4 bg-white p-4 rounded shadow" onsubmit="return validateDateRange()">
     <!-- Hiển thị lỗi -->
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${not #lists.isEmpty(errors)}" class="alert alert-danger">
@@ -33,15 +33,31 @@
           <option value="WEEK" th:selected="${request.periodType == 'WEEK'}">Tuần qua</option>
           <option value="MONTH" th:selected="${request.periodType == 'MONTH'}">Tháng qua</option>
           <option value="YEAR" th:selected="${request.periodType == 'YEAR'}">Năm qua</option>
+          <option value="QUARTER" th:selected="${request.periodType == 'QUARTER'}">Chọn quý/năm</option>
           <option value="SPECIFIC_MONTH" th:selected="${request.periodType == 'SPECIFIC_MONTH'}">Chọn tháng/năm</option>
           <option value="CUSTOM" th:selected="${request.periodType == 'CUSTOM'}">Tùy chọn ngày</option>
         </select>
       </div>
 
+      <!-- Chọn quý/năm -->
+      <!-- Thêm class d-none mặc định và id specificQuarter -->
+      <div class="col-md-2 d-none" id="specificQuarter">
+        <label class="form-label">Quý</label>
+        <select name="specificQuarter" class="form-select" th:field="${request.specificQuarter}">
+          <option value="">Chọn quý</option> <!-- Thêm option trống để tránh chọn mặc định -->
+          <option value="1" th:selected="${request.specificQuarter == 1}">Quý 1</option>
+          <option value="2" th:selected="${request.specificQuarter == 2}">Quý 2</option>
+          <option value="3" th:selected="${request.specificQuarter == 3}">Quý 3</option>
+          <option value="4" th:selected="${request.specificQuarter == 4}">Quý 4</option>
+        </select>
+      </div>
+
       <!-- Chọn tháng/năm -->
+      <!-- Thêm class d-none mặc định và id specificMonth -->
       <div class="col-md-2 d-none" id="specificMonth">
         <label class="form-label">Tháng</label>
         <select name="specificMonth" class="form-select" th:field="${request.specificMonth}">
+          <option value="">Chọn tháng</option> <!-- Thêm option trống -->
           <option th:each="month : ${#numbers.sequence(1,12)}"
                   th:value="${month}"
                   th:text="'Tháng ' + ${month}"
@@ -49,6 +65,8 @@
         </select>
       </div>
 
+      <!-- Trường Năm dùng chung cho cả QUARTER và SPECIFIC_MONTH -->
+      <!-- Thêm class d-none mặc định và id specificYear -->
       <div class="col-md-2 d-none" id="specificYear">
         <label class="form-label">Năm</label>
         <input type="number" name="specificYear" class="form-control"
@@ -56,16 +74,18 @@
       </div>
 
       <!-- Tùy chọn ngày -->
-      <div class="col-md-3" id="customDate" >
+      <!-- Thêm class d-none mặc định và id customDate -->
+      <div class="col-md-3 d-none" id="customDate" >
         <label class="form-label">Từ ngày</label>
-        <input type="text" name="customStartDate"
+        <input type="text" name="customStartDate"  id="customStartDate"
                class="form-control" placeholder="dd-MM-yyyy"
                th:value="${request.customStartDate}">
       </div>
 
-      <div class="col-md-3" id="customDateEnd" >
+      <!-- Thêm class d-none mặc định và id customDateEnd -->
+      <div class="col-md-3 d-none" id="customDateEnd" >
         <label class="form-label">Đến ngày</label>
-        <input type="text" name="customEndDate"
+        <input type="text" name="customEndDate" id="customEndDate"
                class="form-control" placeholder="dd-MM-yyyy"
                th:value="${request.customEndDate}">
       </div>
@@ -123,7 +143,7 @@
           <div>
             <div class="small text-white-50">Tổng doanh thu </div>
             <!-- Sửa tên thuộc tính/getter và định dạng BigDecimal -->
-            <div class="display-6" th:text="${#numbers.formatDecimal(summary.totalRevenue, 0, 'COMMA', 2, 'POINT')}" >0.00</div>
+            <div class="display-6" th:text="${#numbers.formatDecimal(summary.getTotalRevenue(), 0, 'COMMA', 0, 'POINT') + ' VNĐ'}" >0.00</div>
           </div>
           <div><i class="fas fa-money-bill-wave fa-2x"></i></div>
         </div>
@@ -183,29 +203,105 @@
   </div>
 
   <script>
+    function parseDate(str) {
+// Chuyển "dd-MM-yyyy" thành Date object
+      const parts = str.split("-");
+      if (parts.length !== 3) return null;
+      const [day, month, year] = parts;
+// Lưu ý: Month trong Date constructor là 0-indexed, nên cần trừ đi 1
+      const date = new Date(year, month - 1, day);
+// Kiểm tra tính hợp lệ của ngày (tránh các ngày như 31/02)
+      if (date.getDate() != day || date.getMonth() != month - 1 || date.getFullYear() != year) {
+        return null; // Ngày không hợp lệ
+      }
+      return date;
+    }
+
+    function validateDateRange() {
+// Lấy loại thời gian hiện tại
+      const selectedPeriodType = document.getElementById("periodType").value;
+
+// Chỉ validate khi loại thời gian là 'CUSTOM'
+      if (selectedPeriodType !== "CUSTOM") {
+        return true; // Cho phép submit nếu không phải loại 'CUSTOM'
+      }
+
+// Logic validation cho loại 'CUSTOM'
+      const startDateStr = document.getElementById("customStartDate").value;
+      const endDateStr = document.getElementById("customEndDate").value;
+
+      if (!startDateStr || !endDateStr) {
+        alert("Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
+        return false;
+      }
+
+      const startDate = parseDate(startDateStr);
+      const endDate = parseDate(endDateStr);
+
+// Kiểm tra xem parseDate có trả về ngày hợp lệ không
+      if (startDate === null || endDate === null) {
+        alert("Định dạng ngày không hợp lệ hoặc ngày không tồn tại. Vui lòng dùng định dạng dd-MM-yyyy.");
+        return false;
+      }
+
+
+      if (endDate < startDate) {
+        alert("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
+        return false;
+      }
+
+// Nếu là CUSTOM và pass hết validation
+      return true;
+    }
+
     const periodType = document.getElementById('periodType');
 
+    const toggleVisibility = (type) => {
+// Ẩn tất cả các trường cụ thể trước
+      document.getElementById('specificQuarter').classList.add('d-none');
+      document.getElementById('specificMonth').classList.add('d-none');
+// specificYear được dùng cho cả QUARTER và SPECIFIC_MONTH, nên cần xử lý riêng một chút
+      document.getElementById('specificYear').classList.add('d-none');
+      document.getElementById('customDate').classList.add('d-none');
+      document.getElementById('customDateEnd').classList.add('d-none');
+
+
+// Hiển thị các trường tương ứng với loại được chọn
+      switch (type) {
+        case 'QUARTER':
+          document.getElementById('specificQuarter').classList.remove('d-none');
+          document.getElementById('specificYear').classList.remove('d-none'); // Hiện trường năm
+          break;
+        case 'SPECIFIC_MONTH':
+          document.getElementById('specificMonth').classList.remove('d-none');
+          document.getElementById('specificYear').classList.remove('d-none'); // Hiện trường năm
+          break;
+        case 'CUSTOM':
+          document.getElementById('customDate').classList.remove('d-none');
+          document.getElementById('customDateEnd').classList.remove('d-none');
+          break;
+// Các trường hợp WEEK, MONTH, YEAR không cần hiện thêm input
+      }
+    };
+
+    // Khởi tạo trạng thái hiển thị khi trang load
     const initVisibility = () => {
       const initialType = periodType.value;
       toggleVisibility(initialType);
     };
 
-    const toggleVisibility = (type) => {
-      // Xử lý SPECIFIC_MONTH
-      document.getElementById('specificMonth').classList.toggle('d-none', type !== 'SPECIFIC_MONTH');
-      document.getElementById('specificYear').classList.toggle('d-none', type !== 'SPECIFIC_MONTH');
 
-      // Xử lý CUSTOM
-      document.getElementById('customDate').classList.toggle('d-none', type !== 'CUSTOM');
-      document.getElementById('customDateEnd').classList.toggle('d-none', type !== 'CUSTOM');
-    };
-
+    // Lắng nghe sự kiện thay đổi trên dropdown periodType
     periodType.addEventListener('change', (e) => {
       toggleVisibility(e.target.value);
     });
 
-    // Khởi tạo khi tải trang
-    initVisibility();
+    // Chạy hàm khởi tạo khi DOM đã sẵn sàng
+    document.addEventListener('DOMContentLoaded', (event) => {
+      initVisibility();
+    });
+
+
   </script>
 </div>
 
